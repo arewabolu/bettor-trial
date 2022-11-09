@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	ui "gitlab.com/arewabolu/game-average/UI"
 	"golang.org/x/exp/slices"
 )
 
@@ -27,17 +28,18 @@ func init() {
 }
 
 func main() {
-
 	flag.Parse()
 	//check how many distinct games exist and also how many repetitve games exist
 	// implement flags today -s -n -agg -h
 	// function that takes all games of one team and returns their gpg ratio
 	//also function to return individual totals per game for home and away team
 	args := flag.Args()
-
+	app := new(ui.App)
 	flagValues := []string{"4x4", "pen18", "pen22"}
 	switch {
 	case len(args) == 0:
+
+		app.AppStart()
 
 	case slices.Contains(flagValues, register):
 		retStr := checkWriter(register, args)
