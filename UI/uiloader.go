@@ -8,9 +8,16 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func AppStart() {
+type App interface {
+	appStart()
+	register()
+	retrieve()
+}
+
+func appStart() {
 	a := app.New()
 	w := a.NewWindow("Bettor")
+	w.Resize(fyne.NewSize(600, 600))
 	w.SetContent(uiLoader())
 	w.ShowAndRun()
 }
