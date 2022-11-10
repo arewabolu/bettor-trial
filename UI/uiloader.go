@@ -9,12 +9,12 @@ import (
 )
 
 type App interface {
-	appStart()
-	register()
-	retrieve()
+	AppStart()
+	Register()
+	Retrieve()
 }
 
-func appStart() {
+func AppStart() {
 	a := app.New()
 	w := a.NewWindow("Bettor")
 	w.Resize(fyne.NewSize(600, 600))
