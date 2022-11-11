@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 
-	ui "gitlab.com/arewabolu/game-average/UI"
 	"golang.org/x/exp/slices"
 )
 
@@ -34,19 +33,19 @@ func main() {
 	// function that takes all games of one team and returns their gpg ratio
 	//also function to return individual totals per game for home and away team
 	args := flag.Args()
-	app := new(ui.App)
+	//app :=
 	flagValues := []string{"4x4", "pen18", "pen22"}
 	switch {
 	case len(args) == 0:
 
-		app.AppStart()
+		//app.AppStart()
 
 	case slices.Contains(flagValues, register):
-		retStr := checkWriter(register, args)
+		retStr := CheckWriter(register, args)
 		fmt.Println(retStr)
 
 	case slices.Contains(flagValues, search):
-		percentages, goals, err := checkReader(search, args)
+		percentages, goals, err := CheckReader(search, args)
 		if err != nil {
 			fmt.Println(err)
 			return
