@@ -88,6 +88,7 @@ func loadRightSide() fyne.CanvasObject {
 	submit := widget.NewButton("Save", func() {
 		HTS, _ := entryBind.Get()
 		ATS, _ := entryBind2.Get()
+		main.CheckWriter()
 	})
 	container.NewVBox(HTHBox, HTSHBox, ATHBox, ATSHBox)
 	rightSide := container.NewBorder(nil, submit, nil, nil)

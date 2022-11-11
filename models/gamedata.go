@@ -1,8 +1,7 @@
-package main
+package models
 
 import (
 	"encoding/csv"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -18,7 +17,7 @@ import (
 //}
 
 // searches for fixtures that matches users request
-func splitData(homeTeam, awayTeam string, data []Data) (validGames []Data) {
+func SplitData(homeTeam, awayTeam string, data []Data) (validGames []Data) {
 	for _, game := range data {
 		if homeTeam == game.home && awayTeam == game.away {
 			validGames = append(validGames, game)
@@ -31,10 +30,10 @@ func splitData(homeTeam, awayTeam string, data []Data) (validGames []Data) {
 }
 
 // combiner for readRecords,splitRecords, and splitData
-func getGames(filePath *string, homeTeam, awayTeam string) (validGames []Data) {
-	records := readRecords(filePath)
+func GetGames(filePath *string, homeTeam, awayTeam string) (validGames []Data) {
+	records := ReadRecords(filePath)
 	data := splitRecords(records)
-	validGames = splitData(homeTeam, awayTeam, data)
+	validGames = SplitData(homeTeam, awayTeam, data)
 	return
 }
 
@@ -43,9 +42,9 @@ func getGames(filePath *string, homeTeam, awayTeam string) (validGames []Data) {
 
 // is as record of the number of goals scored between both teams
 
-func homeTeamScores(filePath *string, HT, AT string) []int {
+func HomeTeamScores(filePath *string, HT, AT string) []int {
 	HTMatches := make([]int, 0)
-	games := getGames(filePath, HT, AT)
+	games := GetGames(filePath, HT, AT)
 	for _, match := range games {
 		if match.home == HT {
 			HTMatches = append(HTMatches, match.homeScore)
@@ -57,9 +56,9 @@ func homeTeamScores(filePath *string, HT, AT string) []int {
 	return HTMatches
 }
 
-func awayTeamScores(filePath *string, HT, AT string) []int {
+func AwayTeamScores(filePath *string, HT, AT string) []int {
 	ATMatches := make([]int, 0)
-	games := getGames(filePath, HT, AT)
+	games := GetGames(filePath, HT, AT)
 	for _, match := range games {
 		if match.away == AT {
 			ATMatches = append(ATMatches, match.awayScore)
@@ -113,7 +112,7 @@ func CompileAdvantage(data []Data) (homeAdv, awayAdv int) {
 }
 
 // returns the percentage of wins for each team
-func percentageWins(homeTeam, awayTeam string, games []Data) []float64 {
+func PercentageWins(homeTeam, awayTeam string, games []Data) []float64 {
 	//(games won/total games played) * 100
 	var homeTeamWins float64
 	var awayTeamWins float64
@@ -137,13 +136,13 @@ func percentageWins(homeTeam, awayTeam string, games []Data) []float64 {
 			draws++
 		}
 	}
-	homeTeamPcnt := percentageCalc(homeTeamWins, divider)
-	drawPcnt := percentageCalc(draws, divider)
-	awayTeamPcnt := awayPercentCalc(homeTeamPcnt, drawPcnt)
+	homeTeamPcnt := PercentageCalc(homeTeamWins, divider)
+	drawPcnt := PercentageCalc(draws, divider)
+	awayTeamPcnt := AwayPercentCalc(homeTeamPcnt, drawPcnt)
 	return []float64{homeTeamPcnt, awayTeamPcnt, drawPcnt}
 }
 
-func scorePercentage4x4(homeTeam, awayTeam string, games []Data) []float64 {
+func ScorePercentage4x4(homeTeam, awayTeam string, games []Data) []float64 {
 	var gameScore1 float64
 	var gameScore2 float64
 	var gameScore3 float64
@@ -161,13 +160,13 @@ func scorePercentage4x4(homeTeam, awayTeam string, games []Data) []float64 {
 		}
 	}
 
-	gameScore1Per := percentageCalc(gameScore1, divider)
-	gameScore2Per := percentageCalc(gameScore2, divider)
-	gameScore3Per := percentageCalc(gameScore3, divider)
+	gameScore1Per := PercentageCalc(gameScore1, divider)
+	gameScore2Per := PercentageCalc(gameScore2, divider)
+	gameScore3Per := PercentageCalc(gameScore3, divider)
 	return []float64{gameScore1Per, gameScore2Per, gameScore3Per}
 }
 
-func scorePercentagePen(homeTeam, awayTeam string, games []Data) []float64 {
+func ScorePercentagePen(homeTeam, awayTeam string, games []Data) []float64 {
 	var gameScore1 float64
 	var gameScore2 float64
 	var gameScore3 float64
@@ -185,28 +184,8 @@ func scorePercentagePen(homeTeam, awayTeam string, games []Data) []float64 {
 		}
 	}
 
-	gameScore1Per := percentageCalc(gameScore1, divider)
-	gameScore2Per := percentageCalc(gameScore2, divider)
-	gameScore3Per := percentageCalc(gameScore3, divider)
+	gameScore1Per := PercentageCalc(gameScore1, divider)
+	gameScore2Per := PercentageCalc(gameScore2, divider)
+	gameScore3Per := PercentageCalc(gameScore3, divider)
 	return []float64{gameScore1Per, gameScore2Per, gameScore3Per}
-}
-
-func getAggregateVerbose(gameType, homeTeam, awayTeam string) (percentageWin, goals []float64, err error) {
-	err = checkRegisteredTeams(homeTeam, awayTeam)
-	checkErr(err)
-	games := getGames(&gameType, homeTeam, awayTeam)
-	err = checkifReg(&gameType, &homeTeam, &awayTeam, games)
-	checkErr(err)
-	err = checkValidLen(&gameType, &homeTeam, &awayTeam, games)
-	checkErr(err)
-	value := trials(games)
-	fmt.Println(value)
-	percentageWin = percentageWins(homeTeam, awayTeam, games)
-
-	if gameType == "4x4" {
-		goals = scorePercentage4x4(homeTeam, awayTeam, games)
-		return
-	}
-	goals = scorePercentagePen(homeTeam, awayTeam, games)
-	return
 }

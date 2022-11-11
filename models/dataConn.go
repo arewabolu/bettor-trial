@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"bufio"
@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 )
 
 // minimum of 190 non repetitive games needed
@@ -40,37 +39,25 @@ const (
 	Juv = "JUV"
 )
 
+var (
+	FilePath = map[string]string{
+		"4x4":   "./database/scoreRecords.csv",
+		"pen18": "./database/fifa18Pen.csv",
+		"pen22": "./database/fifa22Pen.csv",
+	}
+)
+
 type Data struct {
 	home, away           string
 	homeScore, awayScore int
 }
 
 // writematchdata registers new match records
-func WriteMatchData(gameType string, data2Reg []string) (err error) {
-	homeTeam := strings.ToUpper(data2Reg[0])
-	awayTeam := strings.ToUpper(data2Reg[1])
-	homeScore := data2Reg[2]
-	awayScore := data2Reg[3]
-	err = CheckRegisteredTeams(homeTeam, awayTeam)
-	checkErr(err)
-
-	file, err := os.OpenFile(filePath[gameType], os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	wr := csv.NewWriter(file)
-	defer wr.Flush()
-
-	wr.Write([]string{homeTeam, awayTeam, homeScore, awayScore})
-	return nil
-}
 
 // reads fixtures from file in filepath into an array
-func readRecords(gameType *string) (records [][]string) {
+func ReadRecords(gameType *string) (records [][]string) {
 
-	file, err := os.Open(filePath[*gameType])
+	file, err := os.Open(FilePath[*gameType])
 	rdder := bufio.NewReaderSize(file, 400)
 	if err != nil {
 		fmt.Println(err)
@@ -85,11 +72,11 @@ func readRecords(gameType *string) (records [][]string) {
 }
 
 // checkValidFixtures only logs fixtures are not registered or not enough
-func checkifReg(gameType, homeTeam, awayTeam *string, data []Data) error {
+func CheckifReg(gameType, homeTeam, awayTeam *string, data []Data) error {
 	if len(data) == 0 {
 		str := "No registered games between" + *homeTeam + " & " + *awayTeam
 		printErr := errors.New(str)
-		path := "./unregistered/" + *gameType + ".txt"
+		path := "../unregistered/" + *gameType + ".txt"
 		file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 		if err != nil {
 			log.Fatal(err)
@@ -104,7 +91,7 @@ func checkifReg(gameType, homeTeam, awayTeam *string, data []Data) error {
 	return nil
 }
 
-func checkValidLen(gameType, homeTeam, awayTeam *string, data []Data) error {
+func CheckValidLen(gameType, homeTeam, awayTeam *string, data []Data) error {
 	if len(data) < 5 {
 		str := "Not enough registered fixtures between " + *homeTeam + " & " + *awayTeam + "!"
 		printErr := errors.New(str)

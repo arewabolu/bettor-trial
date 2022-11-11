@@ -11,16 +11,9 @@ var (
 	advantage bool
 	register  string
 	search    string
-	filePath  = map[string]string{
-		"4x4":   "./database/scoreRecords.csv",
-		"pen18": "./database/fifa18Pen.csv",
-		"pen22": "./database/fifa22Pen.csv",
-	}
 )
 
 func init() {
-
-	justOnce()
 	flag.BoolVar(&advantage, "adv", false, "To check what teams have an advantage")
 	flag.StringVar(&register, "reg", "", "used to register all games(penalties and mathces)")
 	flag.StringVar(&search, "search", "", "used to search for match results")

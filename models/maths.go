@@ -1,15 +1,15 @@
-package main
+package models
 
-func homeAwayAvg(filePath *string, HT, AT string, games []Data) (homeAvg, awayAvg float64) {
-	homeSum := float64(sumArray(homeTeamScores(filePath, HT, AT)))
-	awaySum := float64(sumArray(awayTeamScores(filePath, HT, AT)))
+func HomeAwayAvg(filePath *string, HT, AT string, games []Data) (homeAvg, awayAvg float64) {
+	homeSum := float64(sumArray(HomeTeamScores(filePath, HT, AT)))
+	awaySum := float64(sumArray(AwayTeamScores(filePath, HT, AT)))
 	length := float64(len(games))
 	homeAvg = homeSum / length
 	awayAvg = awaySum / length
 	return
 }
 
-func trials(games []Data) string {
+func Trials(games []Data) string {
 	var evens int
 	var odd int
 	for _, fixture := range games {
@@ -26,13 +26,13 @@ func trials(games []Data) string {
 	return "odd"
 }
 
-func percentageCalc(n, divider float64) float64 {
+func PercentageCalc(n, divider float64) float64 {
 	multiplier := n * 100
 	percentage := multiplier / divider
 	return percentage
 }
 
-func awayPercentCalc(HP, drawP float64) float64 {
+func AwayPercentCalc(HP, drawP float64) float64 {
 	AVal := HP + drawP
 	AP := 100 - AVal
 	return AP

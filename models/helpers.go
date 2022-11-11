@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func checkErr(err error) {
+func CheckErr(err error) {
 	if err != nil {
 		fmt.Println("could not process request because", err)
 		os.Exit(1)
@@ -22,8 +22,8 @@ func sumArray(arr []int) (sumMedium int) {
 	return sumMedium
 }
 
-func checkRegisteredTeams(homeTeam, awayTeam string) error {
-	teamArr := []string{avl, ars, bha, bre, bur, che, cry, eve, lei, liv, lu, mci, mu, nor, nu, sou, tot, wat, whu, wol, bar, bay, juv, rma, psg}
+func CheckRegisteredTeams(homeTeam, awayTeam string) error {
+	teamArr := []string{Avl, Ars, Bha, Bre, Bur, Che, Cry, Eve, Lei, Liv, Lu, Mci, Mu, Nor, Nu, Sou, Tot, Wat, Whu, Wol, Bar, Bay, Juv, Rma, Psg}
 	if !slices.Contains(teamArr, homeTeam) || !slices.Contains(teamArr, awayTeam) {
 		err := errors.New("one of the teams names is incorrect")
 		return err
