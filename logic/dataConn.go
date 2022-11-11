@@ -13,31 +13,31 @@ import (
 
 // minimum of 190 non repetitive games needed
 const (
-	avl = "AVL"
-	ars = "ARS"
-	bha = "BHA"
-	bre = "BRE"
-	bur = "BUR"
-	che = "CHE"
-	cry = "CRY"
-	eve = "EVE"
-	lei = "LEI"
-	liv = "LIV"
-	lu  = "LU"
-	mci = "MCI"
-	mu  = "MU"
-	nor = "NOR"
-	nu  = "NU"
-	sou = "SOU"
-	tot = "TOT"
-	wat = "WAT"
-	whu = "WHU"
-	wol = "WOL"
-	psg = "PSG"
-	bay = "BAY"
-	bar = "BAR"
-	rma = "RMA"
-	juv = "JUV"
+	Avl = "AVL"
+	Ars = "ARS"
+	Bha = "BHA"
+	Bre = "BRE"
+	Bur = "BUR"
+	Che = "CHE"
+	Cry = "CRY"
+	Eve = "EVE"
+	Lei = "LEI"
+	Liv = "LIV"
+	Lu  = "LU"
+	Mci = "MCI"
+	Mu  = "MU"
+	Nor = "NOR"
+	Nu  = "NU"
+	Sou = "SOU"
+	Tot = "TOT"
+	Wat = "WAT"
+	Whu = "WHU"
+	Wol = "WOL"
+	Psg = "PSG"
+	Bay = "BAY"
+	Bar = "BAR"
+	Rma = "RMA"
+	Juv = "JUV"
 )
 
 type Data struct {
@@ -51,7 +51,7 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	awayTeam := strings.ToUpper(data2Reg[1])
 	homeScore := data2Reg[2]
 	awayScore := data2Reg[3]
-	err = checkRegisteredTeams(homeTeam, awayTeam)
+	err = CheckRegisteredTeams(homeTeam, awayTeam)
 	checkErr(err)
 
 	file, err := os.OpenFile(filePath[gameType], os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
