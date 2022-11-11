@@ -17,11 +17,11 @@ func CheckWriter(flagValue string, flagArgs []string) string {
 func CheckReader(flagValue string, flagArgs []string) (percentages, goals []float64, err error) {
 	homeTeam := strings.ToUpper(flagArgs[0])
 	awayTeam := strings.ToUpper(flagArgs[1])
-	percentages, goals, err = getAggregateVerbose(flagValue, homeTeam, awayTeam)
+	percentages, goals, err = ReadMatch(flagValue, homeTeam, awayTeam)
 	return
 }
 
-func getAggregateVerbose(gameType, homeTeam, awayTeam string) (percentageWin, goals []float64, err error) {
+func ReadMatch(gameType, homeTeam, awayTeam string) (percentageWin, goals []float64, err error) {
 	err = CheckRegisteredTeams(homeTeam, awayTeam)
 	CheckErr(err)
 	games := GetGames(&gameType, homeTeam, awayTeam)

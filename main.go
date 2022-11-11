@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bettor/controller"
 	"flag"
 	"fmt"
 
@@ -34,7 +35,8 @@ func main() {
 		//app.AppStart()
 
 	case slices.Contains(flagValues, register):
-		retStr := CheckWriter(register, args)
+
+		retStr := controller.CheckWriter(register, args)
 		fmt.Println(retStr)
 
 	case slices.Contains(flagValues, search):
