@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	ui "gitlab.com/arewabolu/game-average/UI"
 	"golang.org/x/exp/slices"
 )
 
@@ -31,16 +32,14 @@ func main() {
 	flagValues := []string{"4x4", "pen18", "pen22"}
 	switch {
 	case len(args) == 0:
-
-		//app.AppStart()
-
+		ui.AppStart()
 	case slices.Contains(flagValues, register):
 
 		retStr := controller.CheckWriter(register, args)
 		fmt.Println(retStr)
 
 	case slices.Contains(flagValues, search):
-		percentages, goals, err := CheckReader(search, args)
+		percentages, goals, err := controller.CheckReader(search, args)
 		if err != nil {
 			fmt.Println(err)
 			return

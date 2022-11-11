@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bettor/models"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -10,7 +11,7 @@ import (
 func CheckWriter(flagValue string, flagArgs []string) string {
 	success := "successfully registered data"
 	err := WriteMatchData(flagValue, flagArgs)
-	CheckErr(err)
+	models.CheckErr(err)
 	return success
 }
 
@@ -22,22 +23,22 @@ func CheckReader(flagValue string, flagArgs []string) (percentages, goals []floa
 }
 
 func ReadMatch(gameType, homeTeam, awayTeam string) (percentageWin, goals []float64, err error) {
-	err = CheckRegisteredTeams(homeTeam, awayTeam)
-	CheckErr(err)
-	games := GetGames(&gameType, homeTeam, awayTeam)
-	err = CheckifReg(&gameType, &homeTeam, &awayTeam, games)
-	CheckErr(err)
-	err = CheckValidLen(&gameType, &homeTeam, &awayTeam, games)
-	CheckErr(err)
-	value := Trials(games)
+	err = models.CheckRegisteredTeams(homeTeam, awayTeam)
+	models.CheckErr(err)
+	games := models.GetGames(&gameType, homeTeam, awayTeam)
+	err = models.CheckifReg(&gameType, &homeTeam, &awayTeam, games)
+	models.CheckErr(err)
+	err = models.CheckValidLen(&gameType, &homeTeam, &awayTeam, games)
+	models.CheckErr(err)
+	value := models.Trials(games)
 	fmt.Println(value)
-	percentageWin = PercentageWins(homeTeam, awayTeam, games)
+	percentageWin = models.PercentageWins(homeTeam, awayTeam, games)
 
 	if gameType == "4x4" {
-		goals = ScorePercentage4x4(homeTeam, awayTeam, games)
+		goals = models.ScorePercentage4x4(homeTeam, awayTeam, games)
 		return
 	}
-	goals = scorePercentagePen(homeTeam, awayTeam, games)
+	goals = models.ScorePercentagePen(homeTeam, awayTeam, games)
 	return
 }
 
@@ -46,10 +47,10 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	awayTeam := strings.ToUpper(data2Reg[1])
 	homeScore := data2Reg[2]
 	awayScore := data2Reg[3]
-	err = CheckRegisteredTeams(homeTeam, awayTeam)
-	checkErr(err)
+	err = models.CheckRegisteredTeams(homeTeam, awayTeam)
+	models.CheckErr(err)
 
-	file, err := os.OpenFile(filePath[gameType], os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	file, err := os.OpenFile(models.FilePath[gameType], os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		return
 	}
