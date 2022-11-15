@@ -2,10 +2,10 @@ package main
 
 import (
 	"bettor/controller"
+	"bettor/views"
 	"flag"
 	"fmt"
 
-	ui "gitlab.com/arewabolu/game-average/UI"
 	"golang.org/x/exp/slices"
 )
 
@@ -32,7 +32,7 @@ func main() {
 	flagValues := []string{"4x4", "pen18", "pen22"}
 	switch {
 	case len(args) == 0:
-		ui.AppStart()
+		views.AppStart()
 	case slices.Contains(flagValues, register):
 
 		retStr := controller.CheckWriter(register, args)

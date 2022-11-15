@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // minimum of 190 non repetitive games needed
@@ -39,25 +40,27 @@ const (
 	Juv = "JUV"
 )
 
-var (
-	FilePath = map[string]string{
-		"4x4":   "./database/scoreRecords.csv",
-		"pen18": "./database/fifa18Pen.csv",
-		"pen22": "./database/fifa22Pen.csv",
-	}
-)
-
 type Data struct {
-	home, away           string
-	homeScore, awayScore int
+	Home, Away           string
+	HomeScore, AwayScore int
+}
+
+func CreateFile(name string) error {
+	if name == "" {
+		return errors.New("please state the name of the file")
+	}
+	_, err := os.Create("./database/" + name + ".csv")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // writematchdata registers new match records
 
 // reads fixtures from file in filepath into an array
-func ReadRecords(gameType *string) (records [][]string) {
-
-	file, err := os.Open(FilePath[*gameType])
+func ReadRecords(gameType string) (records [][]string) {
+	file, err := os.Open("./database/" + gameType + ".csv")
 	rdder := bufio.NewReaderSize(file, 400)
 	if err != nil {
 		fmt.Println(err)
@@ -76,7 +79,7 @@ func CheckifReg(gameType, homeTeam, awayTeam *string, data []Data) error {
 	if len(data) == 0 {
 		str := "No registered games between" + *homeTeam + " & " + *awayTeam
 		printErr := errors.New(str)
-		path := "../unregistered/" + *gameType + ".txt"
+		path := "./unregistered/" + *gameType + ".txt"
 		file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 		if err != nil {
 			log.Fatal(err)
@@ -125,12 +128,24 @@ func splitRecords(records [][]string) []Data {
 			fmt.Println(err)
 		}
 		data := Data{
-			home:      record[0],
-			away:      record[1],
-			homeScore: homeScores,
-			awayScore: awayScores,
+			Home:      record[0],
+			Away:      record[1],
+			HomeScore: homeScores,
+			AwayScore: awayScores,
 		}
 		rdData = append(rdData, data)
 	}
 	return rdData
+}
+
+func dirIterator(basedir string) []string {
+	folder, _ := os.ReadDir(basedir)
+	nameSlice := make([]string, 0)
+	for _, dirFile := range folder {
+		if strings.HasSuffix(dirFile.Name(), ".csv") {
+			name := strings.TrimSuffix(dirFile.Name(), ".csv")
+			nameSlice = append(nameSlice, name)
+		}
+	}
+	return nameSlice
 }

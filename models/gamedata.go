@@ -1,11 +1,5 @@
 package models
 
-import (
-	"encoding/csv"
-	"os"
-	"strconv"
-)
-
 //func createFile() {
 //	file, err := os.OpenFile("scoreRecords.csv", os.O_CREATE|os.O_WRONLY, 0644)
 //	if err != nil {
@@ -13,16 +7,16 @@ import (
 //	}
 //	wr := csv.NewWriter(file)
 //	defer wr.Flush()
-//	wr.Write([]string{"homeTeam", "awayTeam", "homeScore", "awayScore"})
+//	wr.Write([]string{"homeTeam", "awayTeam", "HomeScore", "AwayScore"})
 //}
 
 // searches for fixtures that matches users request
 func SplitData(homeTeam, awayTeam string, data []Data) (validGames []Data) {
 	for _, game := range data {
-		if homeTeam == game.home && awayTeam == game.away {
+		if homeTeam == game.Home && awayTeam == game.Away {
 			validGames = append(validGames, game)
 		}
-		if game.away == homeTeam && game.home == awayTeam {
+		if homeTeam == game.Away && awayTeam == game.Home {
 			validGames = append(validGames, game)
 		}
 	}
@@ -30,8 +24,8 @@ func SplitData(homeTeam, awayTeam string, data []Data) (validGames []Data) {
 }
 
 // combiner for readRecords,splitRecords, and splitData
-func GetGames(filePath *string, homeTeam, awayTeam string) (validGames []Data) {
-	records := ReadRecords(filePath)
+func GetGames(gameType string, homeTeam, awayTeam string) (validGames []Data) {
+	records := ReadRecords(gameType)
 	data := splitRecords(records)
 	validGames = SplitData(homeTeam, awayTeam, data)
 	return
@@ -42,29 +36,29 @@ func GetGames(filePath *string, homeTeam, awayTeam string) (validGames []Data) {
 
 // is as record of the number of goals scored between both teams
 
-func HomeTeamScores(filePath *string, HT, AT string) []int {
+func HomeTeamScores(filePath string, HT, AT string) []int {
 	HTMatches := make([]int, 0)
 	games := GetGames(filePath, HT, AT)
 	for _, match := range games {
-		if match.home == HT {
-			HTMatches = append(HTMatches, match.homeScore)
+		if match.Home == HT {
+			HTMatches = append(HTMatches, match.HomeScore)
 		}
-		if match.away == HT {
-			HTMatches = append(HTMatches, match.awayScore)
+		if match.Home == HT {
+			HTMatches = append(HTMatches, match.AwayScore)
 		}
 	}
 	return HTMatches
 }
 
-func AwayTeamScores(filePath *string, HT, AT string) []int {
+func AwayTeamScores(filePath string, HT, AT string) []int {
 	ATMatches := make([]int, 0)
 	games := GetGames(filePath, HT, AT)
 	for _, match := range games {
-		if match.away == AT {
-			ATMatches = append(ATMatches, match.awayScore)
+		if match.Home == AT {
+			ATMatches = append(ATMatches, match.AwayScore)
 		}
-		if match.home == AT {
-			ATMatches = append(ATMatches, match.homeScore)
+		if match.Home == AT {
+			ATMatches = append(ATMatches, match.HomeScore)
 		}
 	}
 	return ATMatches
@@ -72,39 +66,16 @@ func AwayTeamScores(filePath *string, HT, AT string) []int {
 
 // Returns the average goals scored by both teams
 
-func justOnce() (err error) {
-	file, err := os.OpenFile("scoreRecords.csv", os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	//home vs away = hs vs as
-	wr := csv.NewWriter(file)
-	defer wr.Flush()
-	records := []Data{
-		//{,,,},
-	}
-
-	//input err home!=away team
-	wrData := make([][]string, len(records))
-	for _, record := range records {
-		row := []string{record.home, record.away, strconv.Itoa(record.homeScore), strconv.Itoa(record.awayScore)}
-		wrData = append(wrData, row)
-	}
-	wr.WriteAll(wrData)
-	return nil
-}
-
-// home team advantage vs away teams
+// Home team advantage vs Home teams
 func CompileAdvantage(data []Data) (homeAdv, awayAdv int) {
 	for _, v := range data {
-		if v.homeScore == v.awayScore {
+		if v.HomeScore == v.AwayScore {
 			continue
 		}
-		if v.homeScore < v.awayScore {
+		if v.HomeScore < v.AwayScore {
 			awayAdv++
 		}
-		if v.homeScore > v.awayScore {
+		if v.HomeScore > v.AwayScore {
 			homeAdv++
 		}
 	}
@@ -120,19 +91,19 @@ func PercentageWins(homeTeam, awayTeam string, games []Data) []float64 {
 	divider := float64(len(games))
 
 	for _, fixture := range games {
-		if homeTeam == fixture.home && fixture.homeScore > fixture.awayScore {
+		if homeTeam == fixture.Home && fixture.HomeScore > fixture.AwayScore {
 			homeTeamWins++
 		}
-		if homeTeam == fixture.away && fixture.awayScore > fixture.homeScore {
+		if homeTeam == fixture.Home && fixture.AwayScore > fixture.HomeScore {
 			homeTeamWins++
 		}
-		if awayTeam == fixture.home && fixture.awayScore > fixture.homeScore {
+		if awayTeam == fixture.Home && fixture.AwayScore > fixture.HomeScore {
 			awayTeamWins++
 		}
-		if awayTeam == fixture.home && fixture.homeScore > fixture.awayScore {
+		if awayTeam == fixture.Home && fixture.HomeScore > fixture.AwayScore {
 			awayTeamWins++
 		}
-		if fixture.homeScore == fixture.awayScore || fixture.awayScore == fixture.homeScore {
+		if fixture.HomeScore == fixture.AwayScore || fixture.AwayScore == fixture.HomeScore {
 			draws++
 		}
 	}
@@ -149,13 +120,13 @@ func ScorePercentage4x4(homeTeam, awayTeam string, games []Data) []float64 {
 	divider := float64(len(games))
 
 	for _, fixture := range games {
-		if fixture.homeScore+fixture.awayScore > 6 {
+		if fixture.HomeScore+fixture.AwayScore > 6 {
 			gameScore1++
 		}
-		if fixture.homeScore+fixture.awayScore > 7 {
+		if fixture.HomeScore+fixture.AwayScore > 7 {
 			gameScore2++
 		}
-		if fixture.homeScore+fixture.awayScore > 8 {
+		if fixture.HomeScore+fixture.AwayScore > 8 {
 			gameScore3++
 		}
 	}
@@ -173,13 +144,13 @@ func ScorePercentagePen(homeTeam, awayTeam string, games []Data) []float64 {
 	divider := float64(len(games))
 
 	for _, fixture := range games {
-		if fixture.homeScore >= 1 && fixture.awayScore >= 1 {
+		if fixture.HomeScore >= 1 && fixture.AwayScore >= 1 {
 			gameScore1++
 		}
-		if fixture.homeScore >= 2 && fixture.awayScore >= 2 {
+		if fixture.HomeScore >= 2 && fixture.AwayScore >= 2 {
 			gameScore2++
 		}
-		if fixture.homeScore >= 3 && fixture.awayScore >= 3 {
+		if fixture.HomeScore >= 3 && fixture.AwayScore >= 3 {
 			gameScore3++
 		}
 	}
