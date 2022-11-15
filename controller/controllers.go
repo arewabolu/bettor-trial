@@ -23,11 +23,18 @@ func CheckReader(gameType string, gameValues []string) (percentages, goals []flo
 
 func ReadMatch(gameType, homeTeam, awayTeam string) (percentageWin, goals []float64, err error) {
 	err = models.CheckRegisteredTeams(homeTeam, awayTeam)
-	models.CheckErr(err)
+	if err != nil {
+		return nil, nil, err
+	}
 	games := models.GetGames(gameType, homeTeam, awayTeam)
 	err = models.CheckifReg(&gameType, &homeTeam, &awayTeam, games)
-	models.CheckErr(err)
-	models.CheckErr(err)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = models.CheckValidLen(&gameType, &homeTeam, &awayTeam, games)
+	if err != nil {
+		return nil, nil, err
+	}
 	percentageWin = models.PercentageWins(homeTeam, awayTeam, games)
 
 	if gameType == "4x4" {
@@ -44,7 +51,7 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	homeScore := data2Reg[2]
 	awayScore := data2Reg[3]
 	//should modify CheckRegisteredTeam??? should return error to verify if team exists
-	err = models.CheckRegisteredTeams(homeTeam, awayTeam)
+	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
 	models.CheckErr(err)
 
 	file, err := os.OpenFile("./database/"+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)

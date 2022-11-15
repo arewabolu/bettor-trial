@@ -3,7 +3,6 @@ package controller
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
-	"gitlab.com/arewabolu/game-average/controller"
 )
 
 func SaveButton(radio *widget.RadioGroup, ent ...*widget.Entry) *widget.Button {
@@ -13,7 +12,7 @@ func SaveButton(radio *widget.RadioGroup, ent ...*widget.Entry) *widget.Button {
 		HTS := ent[2].Text
 		ATS := ent[3].Text
 		values := []string{HT, AT, HTS, ATS}
-		controller.CheckWriter(radio.Selected, values)
+		CheckWriter(radio.Selected, values)
 		entryDel(ent...)
 	})
 }

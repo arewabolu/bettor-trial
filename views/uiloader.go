@@ -2,11 +2,14 @@ package views
 
 import (
 	"bettor/controller"
+	"bettor/models"
 	"fmt"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -19,12 +22,12 @@ func AppStart() {
 	a := app.New()
 	w := a.NewWindow("Bettor")
 	w.Resize(fyne.NewSize(600, 600))
-	w.SetContent(uiLoader())
+	w.SetContent(uiLoader(w))
 	w.ShowAndRun()
 }
 
 // TODO must be able to register teams at the creation of new category
-func leftContainer(freeContainer *fyne.Container) fyne.CanvasObject {
+func leftContainer(freeContainer *fyne.Container, w fyne.Window) fyne.CanvasObject {
 	listData := []string{"create new category", "register new Game", "search for game"}
 	list := widget.NewList(
 		func() int { return len(listData) },
@@ -36,7 +39,8 @@ func leftContainer(freeContainer *fyne.Container) fyne.CanvasObject {
 		})
 	list.OnSelected = func(id widget.ListItemID) {
 		if id == 0 {
-
+			freeContainer.RemoveAll()
+			freeContainer.Add(loadRightSide3())
 		}
 		if id == 1 {
 			freeContainer.RemoveAll()
@@ -44,17 +48,21 @@ func leftContainer(freeContainer *fyne.Container) fyne.CanvasObject {
 		}
 		if id == 2 {
 			freeContainer.RemoveAll()
-			freeContainer.Add(loadRightSide2(freeContainer))
+			freeContainer.Add(loadRightSide2(freeContainer, w))
 		}
+	}
+	list.OnUnselected = func(id widget.ListItemID) {
+		freeContainer.RemoveAll()
+		freeContainer.Add(container.NewCenter(widget.NewLabel("Please Select an Option!")))
 	}
 	return list
 }
 
-func uiLoader() *container.Split {
-	fsttext := container.NewCenter(widget.NewLabel("Please Select a book!"))
+func uiLoader(w fyne.Window) *container.Split {
+	fsttext := container.NewCenter(widget.NewLabel("Please Select an Option!"))
 	emptyCont := container.NewBorder(nil, nil, nil, nil, fsttext)
 
-	l := leftContainer(emptyCont)
+	l := leftContainer(emptyCont, w)
 
 	simp := container.NewHSplit(l, emptyCont)
 	simp.Offset = 0.25
@@ -67,10 +75,11 @@ func loadRightSide1() fyne.CanvasObject {
 	ATEnt := new(widget.Entry)
 	HTSEnt := new(widget.Entry)
 	ATSEnt := new(widget.Entry)
-	radOptions := []string{"fifa4x4Eng", "pen18", "pen22"}
+
+	radOptions := models.DirIterator("./database/")
+
 	rad := widget.NewRadioGroup(radOptions, func(s string) {
 	})
-
 	HTLabel := widget.NewLabel("Home Team:")
 	HTSLabel := widget.NewLabel("Home Teams Score")
 	ATLabel := widget.NewLabel("Away Team:")
@@ -81,22 +90,18 @@ func loadRightSide1() fyne.CanvasObject {
 	HTSHBox := container.NewBorder(nil, nil, HTSLabel, nil, HTSEnt)
 	ATSHBox := container.NewBorder(nil, nil, ATSLabel, nil, ATSEnt)
 	vBox := container.NewVBox(HTHBox, HTSHBox, ATHBox, ATSHBox)
-	submit := SaveButton(rad, HTEnt, ATEnt, HTSEnt, ATSEnt)
-
+	submit := controller.SaveButton(rad, HTEnt, ATEnt, HTSEnt, ATSEnt)
 	rightSide := container.NewBorder(rad, submit, nil, nil, vBox)
 	return rightSide
 }
 
-func loadRightSide2(freeCont *fyne.Container) fyne.CanvasObject {
-	var (
-		percentages, goals []float64
-	)
+func loadRightSide2(freeCont *fyne.Container, w fyne.Window) fyne.CanvasObject {
 	HTEnt := new(widget.Entry)
 	ATEnt := new(widget.Entry)
 	HTLabel := widget.NewLabel("Home Team:")
 	ATLabel := widget.NewLabel("Away Team:")
 
-	radOptions := []string{"fifa4x4Eng", "pen18", "pen22"}
+	radOptions := models.DirIterator("./database/")
 	rad := widget.NewRadioGroup(radOptions, func(s string) {
 	})
 
@@ -104,10 +109,18 @@ func loadRightSide2(freeCont *fyne.Container) fyne.CanvasObject {
 		HT := HTEnt.Text
 		AT := ATEnt.Text
 		values := []string{HT, AT}
-		percentages, goals, _ = controller.CheckReader(rad.Selected, values)
+		percentages, goals, err := controller.CheckReader(rad.Selected, values)
+		if err != nil {
+			dialog.ShowError(err, w)
+			return
+		}
 		labels := groupie(percentages, goals, radOptions, values, rad)
 		freeCont.RemoveAll()
-		freeCont.Add(container.NewVBox(labels[0], labels[1], labels[2], labels[3], labels[4], labels[5]))
+		backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
+			freeCont.RemoveAll()
+			freeCont.Add(loadRightSide2(freeCont, w))
+		})
+		freeCont.Add(container.NewBorder(backButn, nil, nil, nil, container.NewVBox(labels[0], labels[1], labels[2], labels[3], labels[4], labels[5])))
 	})
 
 	HTHBox := container.NewBorder(nil, nil, HTLabel, nil, HTEnt)
@@ -133,7 +146,7 @@ func groupie(percentages, goalPercentages []float64, radOptions, Teams []string,
 	goalVal1 := new(widget.Label)
 	goalVal2 := new(widget.Label)
 	goalVal3 := new(widget.Label)
-	if rad.Selected == radOptions[0] {
+	if rad.Selected == "fifa4x4Eng" {
 		goalVal1.Text = fmt.Sprintf("There's a %.2f of both teams scoring over 6 goal(s)\n", goalPercentages[0])
 		goalVal2.Text = fmt.Sprintf("There's a %.2f of both teams scoring over 7 goal(s)\n", goalPercentages[1])
 		goalVal3.Text = fmt.Sprintf("There's a %.2f of both teams scoring over 8 goal(s)\n", goalPercentages[2])
@@ -145,6 +158,12 @@ func groupie(percentages, goalPercentages []float64, radOptions, Teams []string,
 	return []*widget.Label{perc1, perc2, perc3, goalVal1, goalVal2, goalVal3}
 }
 
-func newFunc() {
+func loadRightSide3() fyne.CanvasObject {
+	gameType := new(widget.Entry)
+	button := widget.NewButton("Create", func() {
+		models.CreateFile(gameType.Text)
+	})
 
+	vBox := container.NewVBox(gameType, button)
+	return vBox
 }

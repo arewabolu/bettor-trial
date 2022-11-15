@@ -77,7 +77,7 @@ func ReadRecords(gameType string) (records [][]string) {
 // checkValidFixtures only logs fixtures are not registered or not enough
 func CheckifReg(gameType, homeTeam, awayTeam *string, data []Data) error {
 	if len(data) == 0 {
-		str := "No registered games between" + *homeTeam + " & " + *awayTeam
+		str := "No registered games between " + *homeTeam + " & " + *awayTeam
 		printErr := errors.New(str)
 		path := "./unregistered/" + *gameType + ".txt"
 		file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
@@ -138,7 +138,7 @@ func splitRecords(records [][]string) []Data {
 	return rdData
 }
 
-func dirIterator(basedir string) []string {
+func DirIterator(basedir string) []string {
 	folder, _ := os.ReadDir(basedir)
 	nameSlice := make([]string, 0)
 	for _, dirFile := range folder {
