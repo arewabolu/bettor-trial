@@ -49,7 +49,7 @@ func CreateFile(name string) error {
 	if name == "" {
 		return errors.New("please state the name of the file")
 	}
-	_, err := os.Create("./database/" + name + ".csv")
+	_, err := os.Create(GetBase() + name + ".csv")
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func CreateFile(name string) error {
 
 // reads fixtures from file in filepath into an array
 func ReadRecords(gameType string) (records [][]string) {
-	file, err := os.Open("./database/" + gameType + ".csv")
+	file, err := os.Open(GetBase() + gameType + ".csv")
 	rdder := bufio.NewReaderSize(file, 400)
 	if err != nil {
 		fmt.Println(err)

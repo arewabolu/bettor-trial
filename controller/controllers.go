@@ -54,7 +54,7 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
 	models.CheckErr(err)
 
-	file, err := os.OpenFile("./database/"+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	file, err := os.OpenFile(models.GetBase()+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		return
 	}

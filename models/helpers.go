@@ -30,3 +30,14 @@ func CheckRegisteredTeams(homeTeam, awayTeam string) error {
 	}
 	return nil
 }
+
+func GetHome() (string, error) {
+	home, err := os.UserHomeDir()
+	return home, err
+}
+
+func GetBase() string {
+	home, _ := GetHome()
+	basedir := home + "/bettor/database/"
+	return basedir
+}

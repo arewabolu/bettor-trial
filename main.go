@@ -2,9 +2,11 @@ package main
 
 import (
 	"bettor/controller"
+	"bettor/models"
 	"bettor/views"
 	"flag"
 	"fmt"
+	"os"
 
 	"golang.org/x/exp/slices"
 )
@@ -15,7 +17,25 @@ var (
 	search    string
 )
 
+func makeDir() error {
+	//test on windows
+	home, homeDirErr := models.GetHome()
+	if homeDirErr != nil {
+		return homeDirErr
+	}
+	err := os.MkdirAll(home+"/bettor/database/", os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func init() {
+
+	err := makeDir()
+	if err != nil {
+		os.Exit(1)
+	}
 	flag.BoolVar(&advantage, "adv", false, "To check what teams have an advantage")
 	flag.StringVar(&register, "reg", "", "used to register all games(penalties and mathces)")
 	flag.StringVar(&search, "search", "", "used to search for match results")

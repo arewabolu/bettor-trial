@@ -19,7 +19,7 @@ type App interface {
 }
 
 func AppStart() {
-	a := app.New()
+	a := app.NewWithID("gitlab.com/arewabolu/game-averages")
 	w := a.NewWindow("Bettor")
 	w.Resize(fyne.NewSize(600, 600))
 	w.SetContent(uiLoader(w))
@@ -65,7 +65,6 @@ func uiLoader(w fyne.Window) *container.Split {
 	l := leftContainer(emptyCont, w)
 
 	simp := container.NewHSplit(l, emptyCont)
-	simp.Offset = 0.25
 
 	return simp
 }
@@ -76,7 +75,7 @@ func loadRightSide1() fyne.CanvasObject {
 	HTSEnt := new(widget.Entry)
 	ATSEnt := new(widget.Entry)
 
-	radOptions := models.DirIterator("./database/")
+	radOptions := models.DirIterator(models.GetBase())
 
 	rad := widget.NewRadioGroup(radOptions, func(s string) {
 	})
@@ -101,7 +100,7 @@ func loadRightSide2(freeCont *fyne.Container, w fyne.Window) fyne.CanvasObject {
 	HTLabel := widget.NewLabel("Home Team:")
 	ATLabel := widget.NewLabel("Away Team:")
 
-	radOptions := models.DirIterator("./database/")
+	radOptions := models.DirIterator(models.GetBase())
 	rad := widget.NewRadioGroup(radOptions, func(s string) {
 	})
 
