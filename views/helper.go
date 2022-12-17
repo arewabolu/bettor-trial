@@ -9,7 +9,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func SaveButton(radio *widget.RadioGroup, w fyne.Window, ent ...*widget.Entry) *widget.Button {
+func SaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *widget.Button {
 	return widget.NewButton("Save", func() {
 		HT := ent[0].Text
 		AT := ent[1].Text
@@ -17,12 +17,12 @@ func SaveButton(radio *widget.RadioGroup, w fyne.Window, ent ...*widget.Entry) *
 		ATS := ent[3].Text
 		values := []string{HT, AT, HTS, ATS}
 
-		if radio.Selected == "" {
+		if Select.Selected == "" {
 			dialog.ShowError(errors.New("please select the game type"), w)
 			return
 		}
 
-		err := controller.CheckWriter(radio.Selected, values)
+		err := controller.CheckWriter(Select.Selected, values)
 		if err != nil {
 			dialog.ShowError(err, w)
 			return

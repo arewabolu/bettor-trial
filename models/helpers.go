@@ -2,18 +2,17 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"golang.org/x/exp/slices"
 )
 
-func CheckErr(err error) {
-	if err != nil {
-		fmt.Println("could not process request because", err)
-		os.Exit(1)
-	}
-}
+//func CheckErr(err error) {
+//	if err != nil {
+//		fmt.Println("could not process request because", err)
+//		os.Exit(1)
+//	}
+//}
 
 func sumArray(arr []int) (sumMedium int) {
 	for _, item := range arr {

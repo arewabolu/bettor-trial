@@ -119,6 +119,9 @@ func splitRecords(records [][]string) []Data {
 		if index == 0 {
 			continue
 		}
+		if record[0] == "" || record[1] == "" || record[2] == "" || record[3] == "" {
+			continue
+		}
 		homeScores, err := strconv.Atoi(record[2])
 		if err != nil {
 			fmt.Println(err)

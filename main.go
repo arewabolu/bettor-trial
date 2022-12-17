@@ -59,25 +59,25 @@ func main() {
 		fmt.Println(retStr)
 
 	case slices.Contains(flagValues, search):
-		percentages, goals, err := controller.CheckReader(search, args)
+		_, percentageWinorDraw, _, err := controller.CheckReader(search, args)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		fmt.Printf("%s win percentage %.2f\n", flag.Arg(0), percentages[0])
-		fmt.Printf("%s win percentage %.2f\n", flag.Arg(1), percentages[1])
-		fmt.Printf("draw percentage %.2f\n", percentages[2])
+		fmt.Printf("%s win percentage %.2f\n", flag.Arg(0), percentageWinorDraw[0])
+		fmt.Printf("%s win percentage %.2f\n", flag.Arg(1), percentageWinorDraw[1])
+		fmt.Printf("draw percentage %.2f\n", percentageWinorDraw[2])
 
-		if search == flagValues[0] {
-			fmt.Printf("There's a %.2f of both teams scoring over 6 goal(s)\n", goals[0])
-			fmt.Printf("There's a %.2f of both teams scoring over 7 goal(s)\n", goals[1])
-			fmt.Printf("There's a %.2f of both teams scoring over 8 goal(s)\n", goals[2])
-		} else {
-			fmt.Printf("There's a %.2f of both teams scoring 1 goal(s)\n", goals[0])
-			fmt.Printf("There's a %.2f of both teams scoring 2 goal(s)\n", goals[1])
-			fmt.Printf("There's a %.2f of both teams scoring 3 goal(s)\n", goals[2])
-		}
+	//	if search == flagValues[0] {
+	//	fmt.Printf("There's a %.2f of both teams scoring over 6 goal(s)\n", goals[0])
+	//	fmt.Printf("There's a %.2f of both teams scoring over 7 goal(s)\n", goals[1])
+	//	fmt.Printf("There's a %.2f of both teams scoring over 8 goal(s)\n", goals[2])
+	//	} else {
+	//		fmt.Printf("There's a %.2f of both teams scoring 1 goal(s)\n", goals[0])
+	//		fmt.Printf("There's a %.2f of both teams scoring 2 goal(s)\n", goals[1])
+	//		fmt.Printf("There's a %.2f of both teams scoring 3 goal(s)\n", goals[2])
+	//	}
 
 	default:
 		fmt.Println("the value of your flag is incorrect,please confirm")
