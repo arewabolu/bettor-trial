@@ -83,9 +83,20 @@ func PercentageWinorDraw(gametype, homeTeam, awayTeam string, games []Data) []fl
 		if fixture.HomeScore == fixture.AwayScore || fixture.AwayScore == fixture.HomeScore {
 			draws++
 		}
-		if fixture.HomeScore == oneDif(fixture.AwayScore) || fixture.AwayScore == oneDif(fixture.HomeScore) && gametype == "fifa22Pen" || gametype == "fifa18Pen" {
+		if fixture.HomeScore == oneDif(fixture.AwayScore) && gametype == "fifa18Pen" {
 			continue
 		}
+		if fixture.HomeScore == oneDif(fixture.AwayScore) && gametype == "fifa22Pen" {
+			continue
+		}
+		if fixture.AwayScore == oneDif(fixture.HomeScore) && gametype == "fifa18Pen" {
+			continue
+		}
+		if fixture.AwayScore == oneDif(fixture.HomeScore) && gametype == "fifa22Pen" {
+			continue
+		}
+		//|| fixture.AwayScore == oneDif(fixture.HomeScore)
+		//gametype == "fifa22Pen"
 	}
 	homeTeamWinPcnt := PercentageCalc(homeTeamWins, divider)
 	drawPcnt := PercentageCalc(draws, divider)

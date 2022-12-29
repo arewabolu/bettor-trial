@@ -56,24 +56,6 @@ func CreateFile(name string) error {
 	return nil
 }
 
-// writematchdata registers new match records
-
-// reads fixtures from file in filepath into an array
-func ReadRecords(gameType string) (records [][]string) {
-	file, err := os.Open(GetBase() + gameType + ".csv")
-	rdder := bufio.NewReaderSize(file, 400)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-	rd := csv.NewReader(rdder)
-	records, err = rd.ReadAll()
-	if err != nil {
-		fmt.Println(err)
-	}
-	return records
-}
-
 // checkValidFixtures only logs fixtures are not registered or not enough
 func CheckifReg(gameType, homeTeam, awayTeam *string, data []Data) error {
 	if len(data) == 0 {
@@ -112,6 +94,34 @@ func CheckValidLen(gameType, homeTeam, awayTeam *string, data []Data) error {
 	return nil
 }
 
+func DirIterator(basedir string) []string {
+	folder, _ := os.ReadDir(basedir)
+	nameSlice := make([]string, 0)
+	for _, dirFile := range folder {
+		if strings.HasSuffix(dirFile.Name(), ".csv") {
+			name := strings.TrimSuffix(dirFile.Name(), ".csv")
+			nameSlice = append(nameSlice, name)
+		}
+	}
+	return nameSlice
+}
+
+// reads fixtures from file in filepath into an array
+func ReadRecords(gameType string) (records [][]string) {
+	file, err := os.Open(GetBase() + gameType + ".csv")
+	rdder := bufio.NewReaderSize(file, 400)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+	rd := csv.NewReader(rdder)
+	records, err = rd.ReadAll()
+	if err != nil {
+		fmt.Println(err)
+	}
+	return records
+}
+
 // splits all fixtures into an array of match data
 func splitRecords(records [][]string) []Data {
 	rdData := make([]Data, 0)
@@ -139,16 +149,4 @@ func splitRecords(records [][]string) []Data {
 		rdData = append(rdData, data)
 	}
 	return rdData
-}
-
-func DirIterator(basedir string) []string {
-	folder, _ := os.ReadDir(basedir)
-	nameSlice := make([]string, 0)
-	for _, dirFile := range folder {
-		if strings.HasSuffix(dirFile.Name(), ".csv") {
-			name := strings.TrimSuffix(dirFile.Name(), ".csv")
-			nameSlice = append(nameSlice, name)
-		}
-	}
-	return nameSlice
 }
