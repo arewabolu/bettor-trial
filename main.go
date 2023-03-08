@@ -59,7 +59,7 @@ func main() {
 		fmt.Println(retStr)
 
 	case slices.Contains(flagValues, search):
-		_, percentageWinorDraw, _, err := controller.CheckReader(search, args)
+		_, percentageWinorDraw, err := controller.CheckReader(search, args)
 		if err != nil {
 			fmt.Println(err)
 			return
