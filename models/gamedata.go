@@ -1,32 +1,91 @@
 package models
 
+import (
+	"fmt"
+
+	"github.com/arewabolu/csvmanager"
+)
+
 // searches for fixtures that matches users request
-func SplitData(homeTeam, awayTeam string, data []Data) (validGames []Data) {
-	for _, game := range data {
-		if homeTeam == game.Home && awayTeam == game.Away {
-			validGames = append(validGames, game)
+func SplitData(homeTeam, awayTeam string, data csvmanager.Frame) (validGames []Data) {
+
+	for _, game := range data.Rws {
+		nwData := &Data{}
+		game.Interface(nwData)
+		if homeTeam == nwData.Home && awayTeam == nwData.Away {
+			validGames = append(validGames, *nwData)
 		}
-		if homeTeam == game.Away && awayTeam == game.Home {
-			validGames = append(validGames, game)
+		if homeTeam == nwData.Away && awayTeam == nwData.Home {
+			validGames = append(validGames, *nwData)
+		}
+	}
+
+	return
+}
+
+// returns a single teams home and away goals
+func SearchTeam(team string, data csvmanager.Frame) (validGoals []int) {
+	for _, game := range data.Rws {
+		nwData := &Data{}
+		game.Interface(nwData)
+		if team == nwData.Home {
+			validGoals = append(validGoals, nwData.HomeScore)
+		}
+		if team == nwData.Away {
+			validGoals = append(validGoals, nwData.HomeScore)
 		}
 	}
 	return
 }
 
-// combiner for readRecords,splitRecords, and splitData
+// here a teams home goals and away goals a returned seperately
+func SearchTeam2(team string, data csvmanager.Frame) (homeGoals []int, awayGoals []int) {
+	for _, game := range data.Rows() {
+		nwData := &Data{}
+		game.Interface(nwData)
+
+		if team == nwData.Home {
+			homeGoals = append(homeGoals, nwData.HomeScore)
+		}
+		if team == nwData.Away {
+			awayGoals = append(awayGoals, nwData.AwayScore)
+		}
+	}
+	return
+}
+
+// returns opponents goals for a single team
+func SearchTeam3(team string, data csvmanager.Frame) (homeGoals []int) {
+	for _, game := range data.Rows() {
+		nwData := &Data{}
+		game.Interface(nwData)
+
+		if team == nwData.Home {
+			homeGoals = append(homeGoals, nwData.AwayScore)
+		}
+		if team == nwData.Away {
+			homeGoals = append(homeGoals, nwData.HomeScore)
+		}
+	}
+	return
+}
+
+// combiner for readRecords and splitData
 func GetGames(gameType *string, homeTeam, awayTeam string) (validGames []Data) {
-	records := ReadRecords(*gameType)
-	data := splitRecords(records)
-	validGames = SplitData(homeTeam, awayTeam, data)
+	file, err := csvmanager.ReadCsv(GetBase()+*gameType+".csv", 400)
+	if err != nil {
+		fmt.Println(err)
+	}
+	//	data := splitRecords(records)
+	validGames = SplitData(homeTeam, awayTeam, file)
 	return
 }
 
 // goals per game
 // goals per game against
 
-// is as record of the number of goals scored by the hometeam
-func HomeTeamScores(filePath string, HT, AT string) []int {
-	HTMatches := make([]int, 0)
+// is as record of the number of goals scored by the both teams
+func TeamGoals(filePath string, HT, AT string) (HTMatches, ATMatches []int) {
 	games := GetGames(&filePath, HT, AT)
 	for _, match := range games {
 		if match.Home == HT {
@@ -35,15 +94,6 @@ func HomeTeamScores(filePath string, HT, AT string) []int {
 		if match.Away == HT {
 			HTMatches = append(HTMatches, match.AwayScore)
 		}
-	}
-	return HTMatches
-}
-
-// is as record of the number of goals scored by the awayteam
-func AwayTeamScores(filePath string, HT, AT string) []int {
-	ATMatches := make([]int, 0)
-	games := GetGames(&filePath, HT, AT)
-	for _, match := range games {
 		if match.Home == AT {
 			ATMatches = append(ATMatches, match.AwayScore)
 		}
@@ -51,7 +101,7 @@ func AwayTeamScores(filePath string, HT, AT string) []int {
 			ATMatches = append(ATMatches, match.HomeScore)
 		}
 	}
-	return ATMatches
+	return
 }
 
 // Returns the average goals scored by both teams

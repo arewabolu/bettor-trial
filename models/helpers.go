@@ -40,3 +40,11 @@ func GetBase() string {
 	basedir := home + "/bettor/database/"
 	return basedir
 }
+
+func PrepForRow(x []string, mean string) [][]string {
+	rowArr := make([][]string, 0, len(x))
+	for i := 0; i < len(x); i++ {
+		rowArr = append(rowArr, []string{x[i], mean})
+	}
+	return rowArr
+}

@@ -2,15 +2,18 @@ package models
 
 import (
 	"bufio"
-	"encoding/csv"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/arewabolu/csvmanager"
+	"gonum.org/v1/gonum/stat"
 )
 
+// Avl
 // minimum of 190 non repetitive games needed
 const (
 	Avl = "AVL"
@@ -41,8 +44,10 @@ const (
 )
 
 type Data struct {
-	Home, Away           string
-	HomeScore, AwayScore int
+	Home      string
+	Away      string
+	HomeScore int
+	AwayScore int
 }
 
 func CreateFile(name string) error {
@@ -106,47 +111,52 @@ func DirIterator(basedir string) []string {
 	return nameSlice
 }
 
-// reads fixtures from file in filepath into an array
-func ReadRecords(gameType string) (records [][]string) {
-	file, err := os.Open(GetBase() + gameType + ".csv")
-	rdder := bufio.NewReaderSize(file, 400)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-	rd := csv.NewReader(rdder)
-	records, err = rd.ReadAll()
-	if err != nil {
-		fmt.Println(err)
-	}
-	return records
+func TeamAvgs(f csvmanager.Frame) (float64, float64) {
+	HMGl := SearchTeam("MCI", f)
+	meanTeamC := stat.CircularMean(FloatCon(HMGl), nil)
+	meanTeam := stat.Mean(FloatCon(HMGl), nil)
+	//HS := rds.Col("homeScore").Float()
+	//AS := rds.Col("awayScore").Float()
+	//mean, _ := stat.MeanVariance(HS, nil)
+	//mean2, _ := stat.MeanVariance(AS, nil)
+	return meanTeam, meanTeamC
 }
 
-// splits all fixtures into an array of match data
-func splitRecords(records [][]string) []Data {
-	rdData := make([]Data, 0)
-	for index, record := range records {
-		if index == 0 {
-			continue
-		}
-		if record[0] == "" || record[1] == "" || record[2] == "" || record[3] == "" {
-			continue
-		}
-		homeScores, err := strconv.Atoi(record[2])
-		if err != nil {
-			fmt.Println(err)
-		}
-		awayScores, err := strconv.Atoi(record[3])
-		if err != nil {
-			fmt.Println(err)
-		}
-		data := Data{
-			Home:      record[0],
-			Away:      record[1],
-			HomeScore: homeScores,
-			AwayScore: awayScores,
-		}
-		rdData = append(rdData, data)
+func FloatCon(slice []int) []float64 {
+	floatSli := make([]float64, 0)
+	for _, input := range slice {
+		floatSli = append(floatSli, float64(input))
 	}
-	return rdData
+	return floatSli
+}
+
+func MeanDiff(x []float64, mean float64) []float64 {
+	diff := make([]float64, 0, len(x))
+	for index := range x {
+		diff = append(diff, x[index]-mean)
+	}
+	return diff
+}
+
+func FloattoString(x []float64) []string {
+	strFloatArr := make([]string, 0, len(x))
+	for i := range x {
+		strFloat := strconv.FormatFloat(x[i], 'f', 2, 64)
+		strFloatArr = append(strFloatArr, strFloat)
+	}
+	return strFloatArr
+}
+
+func WriteMean(team string, mean float64, goals []float64) {
+	file, err := os.OpenFile("./meandiff"+team+".csv", os.O_CREATE|os.O_RDWR, 0755)
+	if err != nil {
+		panic(err)
+	}
+	w := &csvmanager.WriteFrame{
+		Headers: []string{"meanDiff", "mean"},
+		Rows:    PrepForRow(FloattoString(MeanDiff(goals, mean)), strconv.FormatFloat(mean, 'f', 2, 64)),
+		File:    file,
+	}
+	w.WriteNewCSV()
+
 }
