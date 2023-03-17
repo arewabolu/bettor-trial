@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/arewabolu/csvmanager"
 	"golang.org/x/exp/slices"
 )
 
@@ -47,4 +48,21 @@ func PrepForRow(x []string, mean string) [][]string {
 		rowArr = append(rowArr, []string{x[i], mean})
 	}
 	return rowArr
+}
+
+func StatusAllocator(rds csvmanager.Frame, team string) []int {
+	status := make([]int, 0)
+
+	for _, game := range rds.Rows() {
+		nwData := &Data{}
+		game.Interface(nwData)
+
+		if team == nwData.Home {
+			status = append(status, 1)
+		}
+		if team == nwData.Away {
+			status = append(status, 0)
+		}
+	}
+	return status
 }

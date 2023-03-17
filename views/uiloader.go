@@ -17,7 +17,7 @@ import (
 func AppStart() {
 	a := app.NewWithID("com.example.myid")
 	w := a.NewWindow("Bettor")
-	w.Resize(fyne.NewSize(600, 600))
+	w.Resize(fyne.NewSize(550, 500))
 	w.SetContent(uiLoader(w))
 	w.ShowAndRun()
 }
@@ -41,6 +41,7 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 		w.SetContent(loadRightSide4(w))
 	})
 	grid := container.NewAdaptiveGrid(len(listData), but1, but2, but3, but4)
+
 	return grid
 }
 
@@ -138,6 +139,8 @@ func loadRightSide3(w fyne.Window) fyne.CanvasObject {
 
 func loadRightSide4(w fyne.Window) fyne.CanvasObject {
 	TeamEntry := new(widget.Entry)
+	statusEntry := widget.NewSelect([]string{"home", "away"}, func(s string) {
+	})
 
 	TeamLabel := widget.NewLabel("Team:")
 
@@ -154,25 +157,26 @@ func loadRightSide4(w fyne.Window) fyne.CanvasObject {
 	box := container.NewVBox(TeamEntry)
 	TeamBox := container.NewBorder(nil, nil, TeamLabel, nil, box)
 
-	Box := container.NewBorder(container.NewVBox(backButn1, Select), submit, nil, nil, TeamBox)
+	Box := container.NewBorder(container.NewVBox(backButn1, Select, statusEntry), submit, nil, nil, TeamBox)
 
 	submit.OnTapped = func() {
 		team := TeamEntry.Text
+		status := statusEntry.Selected
 
 		if Select.Selected == "" {
 			dialog.ShowError(errors.New("please select the game type"), w)
 			return
 		}
 
-		meanTeamGls, meanOppGoals, meanHomeGoals, meanAwayGoals := controller.Searcher(Select.Selected, team)
-
+		//meanTeamGls, meanOppGoals, meanHomeGoals, meanAwayGoals := controller.Searcher(Select.Selected, team)
+		xG, MAE := controller.SearcherV2(Select.Selected, team, status)
 		backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 			Box.RemoveAll()
 			w.SetContent(loadRightSide4(w))
 		})
 
 		teamTable := widget.NewTable(
-			func() (int, int) { return 2, 5 },
+			func() (int, int) { return 2, 3 },
 			func() fyne.CanvasObject { return widget.NewLabel("xxxxxxxxxxxx") },
 			func(tci widget.TableCellID, co fyne.CanvasObject) {
 				label := co.(*widget.Label)
@@ -180,23 +184,23 @@ func loadRightSide4(w fyne.Window) fyne.CanvasObject {
 				case tci.Col == 0 && tci.Row == 0:
 					label.SetText("Team")
 				case tci.Col == 1 && tci.Row == 0:
-					label.SetText("GPG")
+					label.SetText("xG")
 				case tci.Col == 2 && tci.Row == 0:
-					label.SetText("GPGA")
-				case tci.Col == 3 && tci.Row == 0:
-					label.SetText("Home GPG")
-				case tci.Col == 4 && tci.Row == 0:
-					label.SetText("AwayGPG")
+					label.SetText("MAE")
+					//	case tci.Col == 3 && tci.Row == 0:
+					//		label.SetText("Home GPG")
+					//	case tci.Col == 4 && tci.Row == 0:
+					//		label.SetText("AwayGPG")
 				case tci.Col == 0 && tci.Row == 1:
 					label.SetText(team)
 				case tci.Col == 1 && tci.Row == 1:
-					label.SetText(fmt.Sprintf("%.2f", meanTeamGls))
+					label.SetText(fmt.Sprintf("%.2f", xG))
 				case tci.Col == 2 && tci.Row == 1:
-					label.SetText(fmt.Sprintf("%.2f", meanOppGoals))
-				case tci.Col == 3 && tci.Row == 1:
-					label.SetText(fmt.Sprintf("%.2f", meanHomeGoals))
-				case tci.Col == 4 && tci.Row == 1:
-					label.SetText(fmt.Sprintf("%.2f", meanAwayGoals))
+					label.SetText(fmt.Sprintf("%.2f", MAE))
+					//	case tci.Col == 3 && tci.Row == 1:
+					//		label.SetText(fmt.Sprintf("%.2f", meanHomeGoals))
+					//	case tci.Col == 4 && tci.Row == 1:
+					//		label.SetText(fmt.Sprintf("%.2f", meanAwayGoals))
 				}
 			})
 

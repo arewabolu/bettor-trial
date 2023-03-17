@@ -43,7 +43,7 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, PercentageWinorDraw
 }
 
 func Searcher(gameType string, team string) (meanTeamGls, meanOppGoals, meanHomeGoals, meanAwayGoals float64) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", 400)
+	rds, _ := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", true, 400)
 	teamGoals := models.SearchTeam(team, rds)
 	meanTeamGls = stat.Mean(models.FloatCon(teamGoals), nil)
 	teamHomeGoals, teamAwayGoals := models.SearchTeam2(team, rds)
@@ -55,6 +55,32 @@ func Searcher(gameType string, team string) (meanTeamGls, meanOppGoals, meanHome
 		models.WriteMean(team, meanTeamGls, models.FloatCon(teamGoals))
 	}
 	return
+}
+
+func SearcherV2(gameType string, team, status string) (float64, float64) {
+	rds, _ := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", true, 400)
+	team = strings.ToUpper(team)
+	teamGoals := models.SearchTeam(team, rds)
+	teamGoalsFloat := models.FloatCon(teamGoals)
+	goalsAgainst := models.SearchTeam3(team, rds)
+	goalsAgainstFLoat := models.FloatCon(goalsAgainst)
+	multiStatus := models.StatusAllocator(rds, team)
+
+	var statusInt float64
+	TD := &models.TeamData{
+		GoalFor:     teamGoalsFloat,
+		GoalAgainst: goalsAgainstFLoat,
+		Status:      models.FloatCon(multiStatus),
+	}
+	if status == "home" { //, "away"
+		statusInt = 1
+	} else {
+		statusInt = 0
+	}
+	r, MAE := models.TrainAndTest(TD)
+	xG := models.AveragexGFCalc(statusInt, r, TD, 30)
+
+	return xG, MAE
 }
 
 func WriteMatchData(gameType string, data2Reg []string) (err error) {

@@ -50,6 +50,10 @@ type Data struct {
 	AwayScore int
 }
 
+type TeamData struct {
+	GoalFor, GoalAgainst, Status []float64
+}
+
 func CreateFile(name string) error {
 	if name == "" {
 		return errors.New("please state the name of the file")
