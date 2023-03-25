@@ -67,20 +67,24 @@ func SearcherV2(gameType string, team, status string) (float64, float64) {
 	multiStatus := models.StatusAllocator(rds, team)
 
 	var statusInt float64
-	TD := &models.TeamData{
-		GoalFor:     teamGoalsFloat,
-		GoalAgainst: goalsAgainstFLoat,
-		Status:      models.FloatCon(multiStatus),
-	}
 	if status == "home" { //, "away"
 		statusInt = 1
 	} else {
 		statusInt = 0
 	}
+
+	TD := &models.TeamData{
+		GoalFor:     teamGoalsFloat,
+		GoalAgainst: goalsAgainstFLoat,
+		Status:      models.FloatCon(multiStatus),
+	}
 	r, MAE := models.TrainAndTest(TD)
 	xG := models.AveragexGFCalc(statusInt, r, TD, 30)
-
+	if xG == 0 {
+		MAE = 0
+	}
 	return xG, MAE
+
 }
 
 func WriteMatchData(gameType string, data2Reg []string) (err error) {
