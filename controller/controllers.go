@@ -27,7 +27,7 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, PercentageWinorDraw
 	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
 	//if err != nil {
 	//	return nil, err
-	//}
+	//} and
 	games := models.GetGames(&gameType, homeTeam, awayTeam)
 	err = models.CheckifReg(&gameType, &homeTeam, &awayTeam, games)
 	if err != nil {
