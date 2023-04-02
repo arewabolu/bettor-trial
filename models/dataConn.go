@@ -158,9 +158,9 @@ func WriteMean(team string, mean float64, goals []float64) {
 	}
 	w := &csvmanager.WriteFrame{
 		Headers: []string{"meanDiff", "mean"},
-		Rows:    PrepForRow(FloattoString(MeanDiff(goals, mean)), strconv.FormatFloat(mean, 'f', 2, 64)),
+		Columns: PrepForRow(FloattoString(MeanDiff(goals, mean)), strconv.FormatFloat(mean, 'f', 2, 64)),
 		File:    file,
 	}
-	w.WriteNewCSV()
+	w.WriteCSV()
 
 }

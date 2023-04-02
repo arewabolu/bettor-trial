@@ -66,14 +66,14 @@ func PercentageWinorDraw(gametype, homeTeam, awayTeam string, games []Data) []fl
 
 // returns a single teams home and away goals
 func SearchTeam(team string, data csvmanager.Frame) (validGoals []int) {
-	for _, game := range data.Rws {
+	for _, game := range data.Rows() {
 		nwData := &Data{}
 		game.Interface(nwData)
 		if team == nwData.Home {
 			validGoals = append(validGoals, nwData.HomeScore)
 		}
 		if team == nwData.Away {
-			validGoals = append(validGoals, nwData.HomeScore)
+			validGoals = append(validGoals, nwData.AwayScore)
 		}
 	}
 	return
@@ -102,10 +102,10 @@ func SearchTeam3(team string, data csvmanager.Frame) (homeGoals []int) {
 		nwData := &Data{}
 		game.Interface(nwData)
 
-		if team == nwData.Home {
+		switch {
+		case team == nwData.Home:
 			homeGoals = append(homeGoals, nwData.AwayScore)
-		}
-		if team == nwData.Away {
+		case team == nwData.Away:
 			homeGoals = append(homeGoals, nwData.HomeScore)
 		}
 	}
@@ -118,7 +118,7 @@ func SearchTeam3(team string, data csvmanager.Frame) (homeGoals []int) {
 // searches for fixtures that matches users request
 func SplitData(homeTeam, awayTeam string, data csvmanager.Frame) (validGames []Data) {
 
-	for _, game := range data.Rws {
+	for _, game := range data.Rows() {
 		nwData := &Data{}
 		game.Interface(nwData)
 		if homeTeam == nwData.Home && awayTeam == nwData.Away {
