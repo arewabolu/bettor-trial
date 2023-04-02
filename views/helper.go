@@ -6,6 +6,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -18,13 +19,25 @@ func SaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *wid
 		values := []string{HT, AT, HTS, ATS}
 
 		if Select.Selected == "" {
-			dialog.ShowError(errors.New("please select the game type"), w)
+			dlog := dialog.NewError(errors.New("please select the game type"), w)
+			dlog.Show()
+			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+				if ke.Name == fyne.KeyReturn {
+					dlog.Hide()
+				}
+			})
 			return
 		}
 
 		err := controller.CheckWriter(Select.Selected, values)
 		if err != nil {
-			dialog.ShowError(err, w)
+			dlog := dialog.NewError(errors.New("please select the game type"), w)
+			dlog.Show()
+			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+				if ke.Name == fyne.KeyReturn {
+					dlog.Hide()
+				}
+			})
 			return
 		}
 		entryDel(ent...)
@@ -43,3 +56,24 @@ func entryDel(entries ...*widget.Entry) {
 		entry.SetText("")
 	}
 }
+
+func TabKey(w fyne.Window, butn *widget.Button) *fyne.KeyEvent {
+	key := new(fyne.KeyEvent)
+	if key.Name == fyne.KeyEscape {
+		w.Canvas().Unfocus()
+	}
+	if key.Name == fyne.KeyReturn {
+		test.Tap(butn)
+	}
+	return key
+}
+
+/*func TabKey2(butn *widget.Button) *fyne.KeyEvent {
+	fmt.Println("called2")
+	key := new(fyne.KeyEvent)
+	if key.Name == fyne.KeyReturn {
+		test.Tap(butn)
+	}
+	return key
+}
+*/

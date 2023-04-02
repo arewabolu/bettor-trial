@@ -10,16 +10,20 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
 func AppStart() {
-	a := app.NewWithID("com.example.myid")
-	w := a.NewWindow("Bettor")
-	w.Resize(fyne.NewSize(550, 500))
-	w.SetContent(uiLoader(w))
-	w.ShowAndRun()
+	app := &appController{
+		application: app.NewWithID("com.example.myid"),
+	}
+	app.appwindow = app.application.NewWindow("Bettor")
+
+	//app.appwindow.Resize(fyne.NewSize(550, 500))
+	app.appwindow.SetContent(uiLoader(app.appwindow))
+	app.appwindow.ShowAndRun()
 }
 
 // TODO must be able to register teams at the creation of new category
@@ -47,10 +51,15 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 
 func loadRightSide1(w fyne.Window) fyne.CanvasObject {
 	HTEnt := new(widget.Entry)
+	HTEnt.ExtendBaseWidget(HTEnt)
 	ATEnt := new(widget.Entry)
+	ATEnt.ExtendBaseWidget(ATEnt)
 	HTSEnt := new(widget.Entry)
+	HTSEnt.ExtendBaseWidget(HTSEnt)
 	ATSEnt := new(widget.Entry)
+	ATSEnt.ExtendBaseWidget(ATSEnt)
 
+	ATSEnt2 := new(widget.Entry)
 	radOptions := models.DirIterator(models.GetBase())
 
 	Select := widget.NewSelect(radOptions, func(s string) {
@@ -59,19 +68,82 @@ func loadRightSide1(w fyne.Window) fyne.CanvasObject {
 	HTSLabel := widget.NewLabel("Home Teams Score")
 	ATLabel := widget.NewLabel("Away Team:")
 	ATSLabel := widget.NewLabel("Away Teams Score:")
-
 	HTHBox := container.NewBorder(nil, nil, HTLabel, nil, HTEnt)
 	ATHBox := container.NewBorder(nil, nil, ATLabel, nil, ATEnt)
 	HTSHBox := container.NewBorder(nil, nil, HTSLabel, nil, HTSEnt)
 	ATSHBox := container.NewBorder(nil, nil, ATSLabel, nil, ATSEnt)
-	vBox := container.NewVBox(HTHBox, HTSHBox, ATHBox, ATSHBox)
 
 	submit := SaveButton(Select, w, HTEnt, ATEnt, HTSEnt, ATSEnt)
 	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 		w.SetContent(uiLoader(w))
 	})
 
-	rightSide := container.NewBorder(backButn, submit, nil, nil, container.NewBorder(Select, nil, nil, nil, vBox))
+	rightSide := container.NewVBox(backButn, HTHBox, HTSHBox, ATHBox, ATSHBox, submit, ATSEnt2)
+
+	/*saveFunc := func() {
+		values := []string{HTEnt.Text, ATEnt.Text, HTSEnt.Text, ATSEnt.Text}
+
+		if Select.Selected == "" {
+			dlog := dialog.NewError(errors.New("please select the game type"), w)
+			dlog.Show()
+			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+				if ke.Name == fyne.KeyReturn {
+					dlog.Hide()
+				}
+			})
+			return
+		}
+
+		err := controller.CheckWriter(Select.Selected, values)
+		if err != nil {
+			dlog := dialog.NewError(errors.New("please select the game type"), w)
+			dlog.Show()
+			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+				if ke.Name == fyne.KeyReturn {
+					dlog.Hide()
+				}
+			})
+		}
+		ent := []*widget.Entry{HTEnt, ATEnt, ATSEnt, HTSEnt}
+		entryDel(ent...)
+		rightSide.Refresh()
+	}*/
+
+	HTSEnt.ExtendBaseWidget(HTEnt)
+	HTEnt.TypedKey(TabKey(w, submit))
+	w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+		switch ke.Name {
+		case fyne.KeyF1:
+			w.Canvas().Focus(HTEnt)
+			key := new(fyne.KeyEvent)
+			if key.Name == fyne.KeyEscape {
+				w.Canvas().Unfocus()
+			}
+			if key.Name == fyne.KeyF2 {
+				fmt.Println("calling F2 in F1")
+				//w.Canvas().Unfocus()
+				w.Canvas().FocusNext()
+			}
+			w.Canvas().Focused().TypedKey(key)
+		case fyne.KeyF2:
+			if w.Canvas().Focused() == HTEnt {
+				w.Canvas().Unfocus()
+				w.Canvas().Focus(HTSEnt)
+			}
+
+		case fyne.KeyF3:
+			w.Canvas().Focus(ATEnt)
+		case fyne.KeyF4:
+			w.Canvas().Focus(ATSEnt)
+		case fyne.KeyReturn:
+			//defer rightSide.Refresh()
+			w.Canvas().Focus(submit)
+			test.Tap(submit)
+		case fyne.KeyEscape:
+			test.TapCanvas(w.Canvas(), HTLabel.Position())
+		}
+
+	})
 	return rightSide
 }
 
@@ -251,7 +323,8 @@ func tableRender(team []string, GP int, percentageWinorDraw []float64) *widget.T
 	return table
 }
 
-func groupie(percentages []float64, Teams []string, rad *widget.RadioGroup) []*widget.Label {
+//Now Defunct
+/*func groupie(percentages []float64, Teams []string, rad *widget.RadioGroup) []*widget.Label {
 	// Percentages
 	perc1 := Creator(fmt.Sprintf("%s win percentage %.2f\n", Teams[0], percentages[0]))
 	perc2 := Creator(fmt.Sprintf("%s win percentage %.2f\n", Teams[1], percentages[1]))
@@ -271,4 +344,4 @@ func groupie(percentages []float64, Teams []string, rad *widget.RadioGroup) []*w
 	//	goalVal3.Text = fmt.Sprintf("There's a %.2f of both teams scoring 3 goal(s)\n", goalPercentages[2])
 	//}
 	return []*widget.Label{perc1, perc2, perc3}
-}
+}*/
