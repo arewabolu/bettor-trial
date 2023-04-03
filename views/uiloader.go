@@ -10,7 +10,6 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -50,16 +49,11 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 }
 
 func loadRightSide1(w fyne.Window) fyne.CanvasObject {
-	HTEnt := new(widget.Entry)
-	HTEnt.ExtendBaseWidget(HTEnt)
-	ATEnt := new(widget.Entry)
-	ATEnt.ExtendBaseWidget(ATEnt)
-	HTSEnt := new(widget.Entry)
-	HTSEnt.ExtendBaseWidget(HTSEnt)
-	ATSEnt := new(widget.Entry)
-	ATSEnt.ExtendBaseWidget(ATSEnt)
+	HTEnt := newSubmitEntry(w)
+	ATEnt := newSubmitEntry(w)
+	HTSEnt := newSubmitEntry(w)
+	ATSEnt := newSubmitEntry(w)
 
-	ATSEnt2 := new(widget.Entry)
 	radOptions := models.DirIterator(models.GetBase())
 
 	Select := widget.NewSelect(radOptions, func(s string) {
@@ -73,14 +67,14 @@ func loadRightSide1(w fyne.Window) fyne.CanvasObject {
 	HTSHBox := container.NewBorder(nil, nil, HTSLabel, nil, HTSEnt)
 	ATSHBox := container.NewBorder(nil, nil, ATSLabel, nil, ATSEnt)
 
-	submit := SaveButton(Select, w, HTEnt, ATEnt, HTSEnt, ATSEnt)
+	submit := SaveButton(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
 	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 		w.SetContent(uiLoader(w))
 	})
 
-	rightSide := container.NewVBox(backButn, HTHBox, HTSHBox, ATHBox, ATSHBox, submit, ATSEnt2)
-
-	/*saveFunc := func() {
+	rightSide := container.NewVBox(backButn, Select, HTHBox, HTSHBox, ATHBox, ATSHBox, submit)
+	ent := []*widget.Entry{&HTEnt.Entry, &ATEnt.Entry, &ATSEnt.Entry, &HTSEnt.Entry}
+	saveFunc := func() {
 		values := []string{HTEnt.Text, ATEnt.Text, HTSEnt.Text, ATSEnt.Text}
 
 		if Select.Selected == "" {
@@ -104,43 +98,29 @@ func loadRightSide1(w fyne.Window) fyne.CanvasObject {
 				}
 			})
 		}
-		ent := []*widget.Entry{HTEnt, ATEnt, ATSEnt, HTSEnt}
+
 		entryDel(ent...)
 		rightSide.Refresh()
-	}*/
+	}
 
-	HTSEnt.ExtendBaseWidget(HTEnt)
-	HTEnt.TypedKey(TabKey(w, submit))
+	HTEnt.button = submit
+	ATEnt.button = submit
+	HTSEnt.button = submit
+	ATSEnt.button = submit
+
 	w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 		switch ke.Name {
 		case fyne.KeyF1:
 			w.Canvas().Focus(HTEnt)
-			key := new(fyne.KeyEvent)
-			if key.Name == fyne.KeyEscape {
-				w.Canvas().Unfocus()
-			}
-			if key.Name == fyne.KeyF2 {
-				fmt.Println("calling F2 in F1")
-				//w.Canvas().Unfocus()
-				w.Canvas().FocusNext()
-			}
-			w.Canvas().Focused().TypedKey(key)
 		case fyne.KeyF2:
-			if w.Canvas().Focused() == HTEnt {
-				w.Canvas().Unfocus()
-				w.Canvas().Focus(HTSEnt)
-			}
-
+			w.Canvas().Focus(HTSEnt)
 		case fyne.KeyF3:
 			w.Canvas().Focus(ATEnt)
 		case fyne.KeyF4:
 			w.Canvas().Focus(ATSEnt)
 		case fyne.KeyReturn:
-			//defer rightSide.Refresh()
 			w.Canvas().Focus(submit)
-			test.Tap(submit)
-		case fyne.KeyEscape:
-			test.TapCanvas(w.Canvas(), HTLabel.Position())
+			saveFunc()
 		}
 
 	})
@@ -322,26 +302,3 @@ func tableRender(team []string, GP int, percentageWinorDraw []float64) *widget.T
 
 	return table
 }
-
-//Now Defunct
-/*func groupie(percentages []float64, Teams []string, rad *widget.RadioGroup) []*widget.Label {
-	// Percentages
-	perc1 := Creator(fmt.Sprintf("%s win percentage %.2f\n", Teams[0], percentages[0]))
-	perc2 := Creator(fmt.Sprintf("%s win percentage %.2f\n", Teams[1], percentages[1]))
-	perc3 := Creator(fmt.Sprintf("draw percentage %.2f\n", percentages[2]))
-
-	// Goals
-	//goalVal1 := new(widget.Label)
-	//goalVal2 := new(widget.Label)
-	//goalVal3 := new(widget.Label)
-	//if rad.Selected == "fifa4x4Eng" {
-	//	goalVal1.Text = fmt.Sprintf("There's a %.2f of both teams scoring over 6 goal(s)\n", goalPercentages[0])
-	//	goalVal2.Text = fmt.Sprintf("There's a %.2f of both teams scoring over 7 goal(s)\n", goalPercentages[1])
-	//	goalVal3.Text = fmt.Sprintf("There's a %.2f of both teams scoring over 8 goal(s)\n", goalPercentages[2])
-	//} else {
-	//	goalVal1.Text = fmt.Sprintf("There's a %.2f of both teams scoring 1 goal(s)\n", goalPercentages[0])
-	//	goalVal2.Text = fmt.Sprintf("There's a %.2f of both teams scoring 2 goal(s)\n", goalPercentages[1])
-	//	goalVal3.Text = fmt.Sprintf("There's a %.2f of both teams scoring 3 goal(s)\n", goalPercentages[2])
-	//}
-	return []*widget.Label{perc1, perc2, perc3}
-}*/
