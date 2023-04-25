@@ -98,3 +98,31 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	wr.Write([]string{homeTeam, awayTeam, homeScore, awayScore})
 	return nil
 }
+
+func WriteMatchDataHalfs(data2Reg []string) (err error) {
+	homeTeam := strings.ToUpper(strings.TrimSpace(data2Reg[0]))
+	home1stHalfScore := strings.TrimSpace(data2Reg[1])
+	home2ndHalfScore := strings.TrimSpace(data2Reg[2])
+
+	awayTeam := strings.ToUpper(strings.TrimSpace(data2Reg[3]))
+	away1stHalfScore := strings.TrimSpace(data2Reg[4])
+	away2ndHalfScore := strings.TrimSpace(data2Reg[5])
+	if homeTeam == "" || home1stHalfScore == "" || home2ndHalfScore == "" || awayTeam == "" || away1stHalfScore == "" || away2ndHalfScore == "" {
+		return errors.New("please fill all entries")
+	}
+	//should modify CheckRegisteredTeam??? should return error to verify if team exists
+	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
+	//models.CheckErr(err)
+
+	file, err := os.OpenFile(models.GetBase()+"fifa4x4halfsEng.csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	wr := csv.NewWriter(file)
+	defer wr.Flush()
+
+	wr.Write([]string{homeTeam, home1stHalfScore, home2ndHalfScore, awayTeam, away1stHalfScore, away2ndHalfScore})
+	return nil
+}

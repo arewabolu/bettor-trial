@@ -27,107 +27,29 @@ func AppStart() {
 
 // TODO must be able to register teams at the creation of new category
 func uiLoader(w fyne.Window) fyne.CanvasObject {
-	listData := []string{"create new category", "register new Game", "search for game", "search for Team Data"}
-	//GFHome, GFAway Avgs,
-	but1 := widget.NewButtonWithIcon(listData[0], theme.ContentAddIcon(), func() {
-		w.SetContent(loadRightSide3(w))
+	but1 := widget.NewButtonWithIcon("create new category", theme.ContentAddIcon(), func() {
+		w.SetContent(CreateNewGame(w))
 	})
 	//width := but1.Size().Width
 	//but1.Resize(fyne.NewSize(width, 20))
-	but2 := widget.NewButtonWithIcon(listData[1], theme.ContentAddIcon(), func() {
-		w.SetContent(loadRightSide1(w))
+	but2 := widget.NewButtonWithIcon("register new Game", theme.ContentAddIcon(), func() {
+		w.SetContent(RegisterGameFullScore(w))
 	})
-	but3 := widget.NewButtonWithIcon(listData[2], theme.SearchIcon(), func() {
-		w.SetContent(loadRightSide2(w))
+	but3 := widget.NewButtonWithIcon("search for game", theme.SearchIcon(), func() {
+		w.SetContent(Searchwith2Teams(w))
 	})
-	but4 := widget.NewButtonWithIcon(listData[3], theme.SearchIcon(), func() {
-		w.SetContent(loadRightSide4(w))
+	but4 := widget.NewButtonWithIcon("search for Team Data", theme.SearchIcon(), func() {
+		w.SetContent(SearchWith1Team(w))
 	})
-	grid := container.NewAdaptiveGrid(len(listData), but1, but2, but3, but4)
+	but5 := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {
+		w.SetContent(RegisterGamehalfScores(w))
+	})
+	grid := container.NewAdaptiveGrid(5, but1, but2, but3, but4, but5)
 
 	return grid
 }
 
-func loadRightSide1(w fyne.Window) fyne.CanvasObject {
-	HTEnt := newSubmitEntry(w)
-	ATEnt := newSubmitEntry(w)
-	HTSEnt := newSubmitEntry(w)
-	ATSEnt := newSubmitEntry(w)
-
-	radOptions := models.DirIterator(models.GetBase())
-
-	Select := widget.NewSelect(radOptions, func(s string) {
-	})
-	HTLabel := widget.NewLabel("Home Team:")
-	HTSLabel := widget.NewLabel("Home Teams Score")
-	ATLabel := widget.NewLabel("Away Team:")
-	ATSLabel := widget.NewLabel("Away Teams Score:")
-	HTHBox := container.NewBorder(nil, nil, HTLabel, nil, HTEnt)
-	ATHBox := container.NewBorder(nil, nil, ATLabel, nil, ATEnt)
-	HTSHBox := container.NewBorder(nil, nil, HTSLabel, nil, HTSEnt)
-	ATSHBox := container.NewBorder(nil, nil, ATSLabel, nil, ATSEnt)
-
-	submit := SaveButton(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
-	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
-		w.SetContent(uiLoader(w))
-	})
-
-	rightSide := container.NewVBox(backButn, Select, HTHBox, HTSHBox, ATHBox, ATSHBox, submit)
-	ent := []*widget.Entry{&HTEnt.Entry, &ATEnt.Entry, &ATSEnt.Entry, &HTSEnt.Entry}
-	saveFunc := func() {
-		values := []string{HTEnt.Text, ATEnt.Text, HTSEnt.Text, ATSEnt.Text}
-
-		if Select.Selected == "" {
-			dlog := dialog.NewError(errors.New("please select the game type"), w)
-			dlog.Show()
-			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-				if ke.Name == fyne.KeyReturn {
-					dlog.Hide()
-				}
-			})
-			return
-		}
-
-		err := controller.CheckWriter(Select.Selected, values)
-		if err != nil {
-			dlog := dialog.NewError(errors.New("please select the game type"), w)
-			dlog.Show()
-			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-				if ke.Name == fyne.KeyReturn {
-					dlog.Hide()
-				}
-			})
-		}
-
-		entryDel(ent...)
-		rightSide.Refresh()
-	}
-
-	HTEnt.button = submit
-	ATEnt.button = submit
-	HTSEnt.button = submit
-	ATSEnt.button = submit
-
-	w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-		switch ke.Name {
-		case fyne.Key1:
-			w.Canvas().Focus(HTEnt)
-		case fyne.KeyF2:
-			w.Canvas().Focus(HTSEnt)
-		case fyne.KeyF3:
-			w.Canvas().Focus(ATEnt)
-		case fyne.KeyF4:
-			w.Canvas().Focus(ATSEnt)
-		case fyne.KeyReturn:
-			w.Canvas().Focus(submit)
-			saveFunc()
-		}
-
-	})
-	return rightSide
-}
-
-func loadRightSide2(w fyne.Window) fyne.CanvasObject {
+func Searchwith2Teams(w fyne.Window) fyne.CanvasObject {
 	HTEnt := new(widget.Entry)
 	ATEnt := new(widget.Entry)
 	HTLabel := widget.NewLabel("Home Team:")
@@ -167,7 +89,7 @@ func loadRightSide2(w fyne.Window) fyne.CanvasObject {
 
 		backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 			Box.RemoveAll()
-			w.SetContent(loadRightSide2(w))
+			w.SetContent(Searchwith2Teams(w))
 		})
 
 		w.SetContent(container.NewBorder(backButn, nil, nil, nil, tableRender(values, GP, []float64{even, odd})))
@@ -177,7 +99,7 @@ func loadRightSide2(w fyne.Window) fyne.CanvasObject {
 	return Box
 }
 
-func loadRightSide3(w fyne.Window) fyne.CanvasObject {
+func CreateNewGame(w fyne.Window) fyne.CanvasObject {
 	gameType := new(widget.Entry)
 	button := widget.NewButton("Create", func() {
 		models.CreateFile(gameType.Text)
@@ -189,7 +111,7 @@ func loadRightSide3(w fyne.Window) fyne.CanvasObject {
 	return vBox
 }
 
-func loadRightSide4(w fyne.Window) fyne.CanvasObject {
+func SearchWith1Team(w fyne.Window) fyne.CanvasObject {
 	TeamEntry := new(widget.Entry)
 	statusEntry := widget.NewSelect([]string{"home", "away"}, func(s string) {
 	})
@@ -224,7 +146,7 @@ func loadRightSide4(w fyne.Window) fyne.CanvasObject {
 		xG, MAE := controller.SearcherV2(Select.Selected, team, status)
 		backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 			Box.RemoveAll()
-			w.SetContent(loadRightSide4(w))
+			w.SetContent(SearchWith1Team(w))
 		})
 
 		teamTable := widget.NewTable(
@@ -239,20 +161,13 @@ func loadRightSide4(w fyne.Window) fyne.CanvasObject {
 					label.SetText("xG")
 				case tci.Col == 2 && tci.Row == 0:
 					label.SetText("MAE")
-					//	case tci.Col == 3 && tci.Row == 0:
-					//		label.SetText("Home GPG")
-					//	case tci.Col == 4 && tci.Row == 0:
-					//		label.SetText("AwayGPG")
+
 				case tci.Col == 0 && tci.Row == 1:
 					label.SetText(team)
 				case tci.Col == 1 && tci.Row == 1:
 					label.SetText(fmt.Sprintf("%.2f", xG))
 				case tci.Col == 2 && tci.Row == 1:
 					label.SetText(fmt.Sprintf("%.2f", MAE))
-					//	case tci.Col == 3 && tci.Row == 1:
-					//		label.SetText(fmt.Sprintf("%.2f", meanHomeGoals))
-					//	case tci.Col == 4 && tci.Row == 1:
-					//		label.SetText(fmt.Sprintf("%.2f", meanAwayGoals))
 				}
 			})
 
@@ -261,44 +176,4 @@ func loadRightSide4(w fyne.Window) fyne.CanvasObject {
 	}
 
 	return Box
-}
-
-func tableRender(team []string, GP int, percentageWinorDraw []float64) *widget.Table {
-	table := widget.NewTable(
-		func() (int, int) { return 3, 5 },
-		func() fyne.CanvasObject { return widget.NewLabel("xxxxxx") },
-		func(tci widget.TableCellID, co fyne.CanvasObject) {
-			label := co.(*widget.Label)
-			switch {
-			case tci.Col == 0 && tci.Row == 0:
-				label.SetText("Team")
-			case tci.Col == 1 && tci.Row == 0:
-				label.SetText("GP")
-			case tci.Col == 2 && tci.Row == 0:
-				label.SetText("even %")
-			case tci.Col == 3 && tci.Row == 0:
-				label.SetText("odd%")
-
-			case tci.Col == 0 && tci.Row == 1:
-				label.SetText(team[0])
-			case tci.Col == 1 && tci.Row == 1:
-				label.SetText(fmt.Sprintf("%d", GP))
-			case tci.Col == 2 && tci.Row == 1:
-				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[0]))
-			case tci.Col == 3 && tci.Row == 1:
-				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[1]))
-
-			case tci.Col == 0 && tci.Row == 2:
-				label.SetText(team[1])
-			case tci.Col == 1 && tci.Row == 2:
-				label.SetText(fmt.Sprintf("%d", GP))
-			case tci.Col == 2 && tci.Row == 2:
-				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[0]))
-			case tci.Col == 3 && tci.Row == 2:
-				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[1]))
-			}
-
-		})
-
-	return table
 }
