@@ -150,17 +150,3 @@ func FloattoString(x []float64) []string {
 	}
 	return strFloatArr
 }
-
-func WriteMean(team string, mean float64, goals []float64) {
-	file, err := os.OpenFile("./meandiff"+team+".csv", os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		panic(err)
-	}
-	w := &csvmanager.WriteFrame{
-		Headers: []string{"meanDiff", "mean"},
-		Columns: PrepForRow(FloattoString(MeanDiff(goals, mean)), strconv.FormatFloat(mean, 'f', 2, 64)),
-		File:    file,
-	}
-	w.WriteCSV()
-
-}

@@ -46,7 +46,7 @@ func TestCheckReader(t *testing.T) {
 	homeTeam := "ars"
 	awayTeam := "mci"
 	//	fawayTeam := "bor"
-	_, _, err := controller.CheckReader("fifa4x4Eng", []string{homeTeam, awayTeam})
+	_, _, _, err := controller.CheckReader("fifa4x4Eng", []string{homeTeam, awayTeam})
 
 	if err != nil {
 		t.Error(err)

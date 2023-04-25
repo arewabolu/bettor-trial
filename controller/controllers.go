@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/arewabolu/csvmanager"
-	"gonum.org/v1/gonum/stat"
 )
 
 func CheckWriter(flagValue string, flagArgs []string) error {
@@ -16,14 +15,14 @@ func CheckWriter(flagValue string, flagArgs []string) error {
 	return err
 }
 
-func CheckReader(gameType string, gameValues []string) (GP int, percentageWinorDraw []float64, err error) {
+func CheckReader(gameType string, gameValues []string) (GP int, even, odd float64, err error) {
 	homeTeam := strings.ToUpper(gameValues[0])
 	awayTeam := strings.ToUpper(gameValues[1])
-	GP, percentageWinorDraw, err = ReadMatch(gameType, homeTeam, awayTeam)
+	GP, even, odd, err = ReadMatch(gameType, homeTeam, awayTeam)
 	return
 }
 
-func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, PercentageWinorDraw []float64, err error) {
+func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, err error) {
 	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
 	//if err != nil {
 	//	return nil, err
@@ -31,29 +30,14 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, PercentageWinorDraw
 	games := models.GetGames(&gameType, homeTeam, awayTeam)
 	err = models.CheckifReg(&gameType, &homeTeam, &awayTeam, games)
 	if err != nil {
-		return 0, nil, err
+		return 0, 0, 0, err
 	}
 	GP = len(games)
 	err = models.CheckValidLen(&gameType, &homeTeam, &awayTeam, games)
 	if err != nil {
-		return 0, nil, err
+		return 0, 0, 0, err
 	}
-	PercentageWinorDraw = models.PercentageWinorDraw(gameType, homeTeam, awayTeam, games)
-	return
-}
-
-func Searcher(gameType string, team string) (meanTeamGls, meanOppGoals, meanHomeGoals, meanAwayGoals float64) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", true, 400)
-	teamGoals := models.SearchTeam(team, rds)
-	meanTeamGls = stat.Mean(models.FloatCon(teamGoals), nil)
-	teamHomeGoals, teamAwayGoals := models.SearchTeam2(team, rds)
-	allOppGoals := models.SearchTeam3(team, rds)                //meanTeamGls, meanOppGoals, meanHomeGoals, meanAwayGoals
-	meanOppGoals = stat.Mean(models.FloatCon(allOppGoals), nil) // arithmetic mean of opposition goals
-	meanHomeGoals = stat.Mean(models.FloatCon(teamHomeGoals), nil)
-	meanAwayGoals = stat.Mean(models.FloatCon(teamAwayGoals), nil)
-	if gameType == "fifa4x4Eng" {
-		models.WriteMean(team, meanTeamGls, models.FloatCon(teamGoals))
-	}
+	even, odd = models.SearchTeam4(homeTeam, awayTeam, gameType)
 	return
 }
 

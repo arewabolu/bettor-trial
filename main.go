@@ -59,15 +59,15 @@ func main() {
 		fmt.Println(retStr)
 
 	case slices.Contains(flagValues, search):
-		_, percentageWinorDraw, err := controller.CheckReader(search, args)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	//	_, even, odd, err := controller.CheckReader(search, args)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//		return
+	//	}
 
-		fmt.Printf("%s win percentage %.2f\n", flag.Arg(0), percentageWinorDraw[0])
-		fmt.Printf("%s win percentage %.2f\n", flag.Arg(1), percentageWinorDraw[1])
-		fmt.Printf("draw percentage %.2f\n", percentageWinorDraw[2])
+	//fmt.Printf("%s win percentage %.2f\n", flag.Arg(0), percentageWinorDraw[0])
+	//	fmt.Printf("%s win percentage %.2f\n", flag.Arg(1), percentageWinorDraw[1])
+	//	fmt.Printf("draw percentage %.2f\n", percentageWinorDraw[2])
 
 	//	if search == flagValues[0] {
 	//	fmt.Printf("There's a %.2f of both teams scoring over 6 goal(s)\n", goals[0])
