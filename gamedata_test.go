@@ -10,7 +10,6 @@ import (
 
 	"github.com/arewabolu/csvmanager"
 	tradefuncs "github.com/arewabolu/trademath"
-	"gonum.org/v1/gonum/stat"
 )
 
 func TestCheckWriter(t *testing.T) {
@@ -69,77 +68,6 @@ func TestMAchanges(t *testing.T) {
 
 }
 
-func TestDiff(t *testing.T) {
-	/*teams := []string{"AVL",
-	"ARS",
-	"BHA",
-	"BRE",
-	"BUR",
-	"CHE",
-	"CRY",
-	"EVE",
-	"LEI",
-	"LIV",
-	"LU",
-	"MCI",
-	"MU",
-	"NOR",
-	"NU",
-	"SOU",
-	"TOT",
-	"WAT",
-	"WHU",
-	"WOL"}
-	*/
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", true)
-	goals := models.SearchTeam(models.Mci, rds)
-	nwGoals := models.FloatCon(goals)
-	var wcnt int
-	var lcnt int
-	for _, val := range nwGoals {
-		if val > 5.5 {
-			wcnt++
-		} else {
-			lcnt++
-
-		}
-	}
-	meanDiff := models.MeanDiff(nwGoals, stat.Mean(nwGoals, nil))
-	ZscorenwGoals := tradefuncs.ZscoreCalc(nwGoals, stat.Mean(nwGoals, nil), stat.StdDev(nwGoals, nil))
-	ZscorenwMeanDif := tradefuncs.ZscoreCalc(meanDiff, stat.Mean(meanDiff, nil), stat.StdDev(meanDiff, nil))
-	//	sort.Float64s(nwReturns)
-	t.Error(wcnt)
-	t.Error(lcnt)
-	t.Error(stat.Skew(nwGoals, nil))
-
-	t.Error(stat.Covariance(ZscorenwGoals, ZscorenwMeanDif, nil))
-	//t.Error(len(nwReturns))
-}
-
-func TestRollingAvg(t *testing.T) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", true)
-	team := models.Mci
-	goals := models.SearchTeam(team, rds)
-	nwGoals := models.FloatCon(goals)
-	MA := tradefuncs.MA(nwGoals, 7)
-	mean := stat.Mean(nwGoals, nil)
-	meanStr := strconv.FormatFloat(mean, 'f', 2, 64)
-	MAStr := models.FloattoString(MA)
-
-	file, err := os.OpenFile("./rollingAvg"+team+".csv", os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		panic(err)
-	}
-	w := &csvmanager.WriteFrame{
-		Headers: []string{"meanDiff", "mean"},
-		Columns: models.PrepForRow(MAStr, meanStr),
-		File:    file,
-	}
-	w.WriteCSV()
-	t.Error(stat.Skew(nwGoals, nil))
-	t.Error(stat.ExKurtosis(nwGoals, nil))
-}
-
 func TestWriter(t *testing.T) {
 	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", true)
 	team := models.Mci
@@ -171,7 +99,7 @@ func TestWriter(t *testing.T) {
 	}
 	w := &csvmanager.WriteFrame{
 		Headers: []string{"goals", "goalsAgainst", "status"},
-		Columns: [][]string{MAStr, MAStr2, status},
+		Arrays:  [][]string{MAStr, MAStr2, status},
 		File:    file,
 	}
 	w.WriteCSV()
