@@ -112,6 +112,27 @@ func SearchTeam3(team string, data csvmanager.Frame) (homeGoals []int) {
 	return
 }
 
+func SearchTeam4(team1, team2 string, game string) (float64, float64) {
+	games := GetGames(&game, team1, team2)
+	var even, odd float64
+	for _, game := range games {
+		sum := game.HomeScore + game.AwayScore
+		switch {
+		case sum == 0:
+			continue
+		case sum%2 == 0:
+			even++
+
+		case sum%2 != 0:
+			odd++
+		}
+	}
+	evenProb := (even / (even + odd)) * 100
+	oddProb := 100 - evenProb
+
+	return oddProb, evenProb
+}
+
 // goals per game
 // goals per game against
 
