@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	fyne.io/fyne/v2 v2.3.3
-	github.com/arewabolu/csvmanager v1.4.8
+	github.com/arewabolu/csvmanager v1.4.10
 	github.com/arewabolu/trademath v0.0.5
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 	gonum.org/v1/gonum v0.12.0
@@ -14,18 +14,6 @@ require (
 require (
 	github.com/benoitkugler/textlayout v0.3.0 // indirect
 	github.com/go-text/typesetting v0.0.0-20221212183139-1eb938670a1f // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/neelance/astrewrite v0.0.0-20160511093645-99348263ae86 // indirect
-	github.com/neelance/sourcemap v0.0.0-20200213170602-2833bce08e4c // indirect
-	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/spf13/cobra v1.2.1 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
-	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/term v0.6.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
 )
 
 require (
