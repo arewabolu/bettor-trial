@@ -110,7 +110,7 @@ func loadRightSide1(w fyne.Window) fyne.CanvasObject {
 
 	w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 		switch ke.Name {
-		case fyne.KeyF1:
+		case fyne.Key1:
 			w.Canvas().Focus(HTEnt)
 		case fyne.KeyF2:
 			w.Canvas().Focus(HTSEnt)
@@ -158,7 +158,7 @@ func loadRightSide2(w fyne.Window) fyne.CanvasObject {
 			return
 		}
 		//GP, percentageWinorDraw, odds,
-		GP, percentageWinorDraw, err := controller.CheckReader(Select.Selected, values)
+		GP, even, odd, err := controller.CheckReader(Select.Selected, values)
 		if err != nil {
 			dialog.ShowError(err, w)
 			return
@@ -170,7 +170,7 @@ func loadRightSide2(w fyne.Window) fyne.CanvasObject {
 			w.SetContent(loadRightSide2(w))
 		})
 
-		w.SetContent(container.NewBorder(backButn, nil, nil, nil, tableRender(values, GP, percentageWinorDraw)))
+		w.SetContent(container.NewBorder(backButn, nil, nil, nil, tableRender(values, GP, []float64{even, odd})))
 
 	}
 
@@ -275,9 +275,9 @@ func tableRender(team []string, GP int, percentageWinorDraw []float64) *widget.T
 			case tci.Col == 1 && tci.Row == 0:
 				label.SetText("GP")
 			case tci.Col == 2 && tci.Row == 0:
-				label.SetText("W%")
+				label.SetText("even %")
 			case tci.Col == 3 && tci.Row == 0:
-				label.SetText("D%")
+				label.SetText("odd%")
 
 			case tci.Col == 0 && tci.Row == 1:
 				label.SetText(team[0])
@@ -286,16 +286,16 @@ func tableRender(team []string, GP int, percentageWinorDraw []float64) *widget.T
 			case tci.Col == 2 && tci.Row == 1:
 				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[0]))
 			case tci.Col == 3 && tci.Row == 1:
-				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[2]))
+				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[1]))
 
 			case tci.Col == 0 && tci.Row == 2:
 				label.SetText(team[1])
 			case tci.Col == 1 && tci.Row == 2:
 				label.SetText(fmt.Sprintf("%d", GP))
 			case tci.Col == 2 && tci.Row == 2:
-				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[1]))
+				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[0]))
 			case tci.Col == 3 && tci.Row == 2:
-				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[2]))
+				label.SetText(fmt.Sprintf("%.2f", percentageWinorDraw[1]))
 			}
 
 		})
