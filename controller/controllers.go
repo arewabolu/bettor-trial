@@ -5,9 +5,11 @@ import (
 	"encoding/csv"
 	"errors"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/arewabolu/csvmanager"
+	"github.com/arewabolu/pi-rating"
 )
 
 func CheckWriter(flagValue string, flagArgs []string) error {
@@ -42,7 +44,7 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, 
 }
 
 func SearcherV2(gameType string, team, status string) (float64, float64) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", true, 400)
+	rds, _ := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", 0755, true, 400)
 	team = strings.ToUpper(team)
 	teamGoals := models.SearchTeam(team, rds)
 	teamGoalsFloat := models.FloatCon(teamGoals)
@@ -85,7 +87,21 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	//should modify CheckRegisteredTeam??? should return error to verify if team exists
 	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
 	//models.CheckErr(err)
-
+	if gameType == "fifa4x4Eng" {
+		homeScoreInt, err := strconv.Atoi(homeScore)
+		if err != nil {
+			return errors.New("please fill correct entry")
+		}
+		awayScoreInt, err := strconv.Atoi(awayScore)
+		if err != nil {
+			return errors.New("please fill correct entry")
+		}
+		err = pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa4x4Eng.csv", homeTeam, awayTeam, homeScoreInt, awayScoreInt)
+		if err != nil {
+			return err
+		}
+	}
+	//TODO: before writing match data, open the teams file to check if it exists, to be moved to checkifReg function
 	file, err := os.OpenFile(models.GetBase()+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		return
