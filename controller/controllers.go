@@ -13,7 +13,11 @@ import (
 )
 
 func CheckWriter(flagValue string, flagArgs []string) error {
-	err := WriteMatchData(flagValue, flagArgs)
+	homeTeam := strings.ToUpper(strings.TrimSpace(flagArgs[0]))
+	awayTeam := strings.ToUpper(strings.TrimSpace(flagArgs[1]))
+	homeScore := strings.TrimSpace(flagArgs[2])
+	awayScore := strings.TrimSpace(flagArgs[3])
+	err := WriteMatchData(flagValue, []string{homeTeam, awayTeam, homeScore, awayScore})
 	return err
 }
 
@@ -70,31 +74,28 @@ func SearcherV2(gameType string, team, status string) (float64, float64) {
 }
 
 func WriteMatchData(gameType string, data2Reg []string) (err error) {
-	homeTeam := strings.ToUpper(strings.TrimSpace(data2Reg[0]))
-	awayTeam := strings.ToUpper(strings.TrimSpace(data2Reg[1]))
-	homeScore := strings.TrimSpace(data2Reg[2])
-	awayScore := strings.TrimSpace(data2Reg[3])
-	if strings.Contains(gameType, "pen") && homeScore == awayScore {
+
+	if strings.Contains(gameType, "pen") && data2Reg[2] == data2Reg[3] {
 		return errors.New("there are no draws in penalties")
 	}
-	if homeTeam == "" || homeScore == "" || awayTeam == "" || awayScore == "" {
+	if data2Reg[0] == "" || data2Reg[1] == "" || data2Reg[2] == "" || data2Reg[3] == "" {
 		return errors.New("please fill all entries")
 	}
 
-	err = models.CheckifReg(gameType, homeTeam, awayTeam)
+	err = models.CheckifReg(gameType, data2Reg[0], data2Reg[1])
 	if err != nil {
 		return err
 	}
 	if gameType == "fifa4x4Eng" {
-		homeScoreInt, err := strconv.Atoi(homeScore)
+		homeScoreInt, err := strconv.Atoi(data2Reg[2])
 		if err != nil {
 			return errors.New("please fill correct entry")
 		}
-		awayScoreInt, err := strconv.Atoi(awayScore)
+		awayScoreInt, err := strconv.Atoi(data2Reg[3])
 		if err != nil {
 			return errors.New("please fill correct entry")
 		}
-		err = pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa4x4Eng.csv", homeTeam, awayTeam, homeScoreInt, awayScoreInt)
+		err = pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa4x4Eng.csv", data2Reg[2], data2Reg[3], homeScoreInt, awayScoreInt)
 		if err != nil {
 			return err
 		}
@@ -108,10 +109,11 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	wr := csv.NewWriter(file)
 	defer wr.Flush()
 
-	wr.Write([]string{homeTeam, awayTeam, homeScore, awayScore})
+	wr.Write([]string{data2Reg[0], data2Reg[1], data2Reg[2], data2Reg[3]})
 	return nil
 }
 
+// deprecated: no longer supported. Use WriteMatchData instead.
 func WriteMatchDataHalfs(data2Reg []string) (err error) {
 	homeTeam := strings.ToUpper(strings.TrimSpace(data2Reg[0]))
 	home1stHalfScore := strings.TrimSpace(data2Reg[1])
