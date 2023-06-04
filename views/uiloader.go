@@ -25,7 +25,6 @@ func AppStart() {
 	app.appwindow.ShowAndRun()
 }
 
-// TODO must be able to register teams at the creation of new category
 func uiLoader(w fyne.Window) fyne.CanvasObject {
 	but1 := widget.NewButtonWithIcon("create new category", theme.ContentAddIcon(), func() {
 		w.SetContent(CreateNewGame(w))
@@ -101,21 +100,29 @@ func Searchwith2Teams(w fyne.Window) fyne.CanvasObject {
 
 func CreateNewGame(w fyne.Window) fyne.CanvasObject {
 	gameType := new(widget.Entry)
-	button := widget.NewButton("Create", func() {
-		models.CreateFile(gameType.Text)
-		models.CreateTeamsFile(gameType.Text)
-	})
-	//TODO: add new page as method of adding new teams
+	store := &gameType.Text
+
 	competitors := widget.NewEntry()
+	competitors.MultiLine = false
 	competitors.SetPlaceHolder("Add new team")
 	saveCompetitors := widget.NewButton("Add team", func() {
-		models.AddTeam(gameType.Text, competitors.Text)
+		models.AddTeam(*store, competitors.Text)
 	})
+	exit := widget.NewButton("exit", func() {
+		w.SetContent(uiLoader(w))
+	})
+	hZ := container.NewBorder(nil, exit, nil, saveCompetitors, competitors)
+	button := widget.NewButtonWithIcon("Create", theme.NavigateNextIcon(), func() {
+		models.CreateFile(gameType.Text)
+		models.CreateTeamsFile(gameType.Text)
+		w.SetContent(hZ)
+	})
+
 	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 		w.SetContent(uiLoader(w))
 	})
-	hZ := container.NewBorder(nil, nil, nil, saveCompetitors, competitors)
-	vBox := container.NewVBox(backButn, gameType, hZ, button)
+
+	vBox := container.NewVBox(backButn, gameType, button)
 	return vBox
 }
 
