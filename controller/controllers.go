@@ -30,15 +30,11 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, 
 	//	return nil, err
 	//} and
 	games := models.GetGames(&gameType, homeTeam, awayTeam)
-	err = models.CheckifReg(&gameType, &homeTeam, &awayTeam, games)
+	err = models.CheckifReg(gameType, homeTeam, awayTeam)
 	if err != nil {
 		return 0, 0, 0, err
 	}
 	GP = len(games)
-	err = models.CheckValidLen(&gameType, &homeTeam, &awayTeam, games)
-	if err != nil {
-		return 0, 0, 0, err
-	}
 	even, odd = models.SearchTeam4(homeTeam, awayTeam, gameType)
 	return
 }
@@ -84,9 +80,11 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	if homeTeam == "" || homeScore == "" || awayTeam == "" || awayScore == "" {
 		return errors.New("please fill all entries")
 	}
-	//should modify CheckRegisteredTeam??? should return error to verify if team exists
-	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
-	//models.CheckErr(err)
+
+	err = models.CheckifReg(gameType, homeTeam, awayTeam)
+	if err != nil {
+		return err
+	}
 	if gameType == "fifa4x4Eng" {
 		homeScoreInt, err := strconv.Atoi(homeScore)
 		if err != nil {
@@ -101,7 +99,6 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 			return err
 		}
 	}
-	//TODO: before writing match data, open the teams file to check if it exists, to be moved to checkifReg function
 	file, err := os.OpenFile(models.GetBase()+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		return

@@ -1,16 +1,14 @@
 package models
 
 import (
-	"bufio"
 	"encoding/csv"
 	"errors"
-	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/arewabolu/csvmanager"
+	"golang.org/x/exp/slices"
 	"gonum.org/v1/gonum/stat"
 )
 
@@ -79,7 +77,7 @@ func CreateTeamsFile(gameName string) error {
 	if gameName == "" {
 		return errors.New("please state the name of the file")
 	}
-	file, err := os.OpenFile(GetBase()+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	file, err := os.OpenFile(GetBaseTeamNames()+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		return err
 	}
@@ -99,7 +97,7 @@ func AddTeam(gameName, teamName string) error {
 	if teamName == "" {
 		return errors.New("please state the name of the team")
 	}
-	file, err := os.OpenFile(GetBase()+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	file, err := os.OpenFile(GetBaseTeamNames()+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		return err
 	}
@@ -115,40 +113,18 @@ func AddTeam(gameName, teamName string) error {
 	return nil
 }
 
-// checkValidFixtures only logs fixtures are not registered or not enough
-func CheckifReg(gameType, homeTeam, awayTeam *string, data []Data) error {
-	if len(data) == 0 {
-		str := "No registered games between " + *homeTeam + " & " + *awayTeam
-		printErr := errors.New(str)
-		path := "./unregistered/" + *gameType + ".txt"
-		file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer file.Close()
-
-		w := bufio.NewWriter(file)
-		fmt.Fprintf(w, "Match data for %s vs  %s does not currently exist\n", *homeTeam, *awayTeam)
-		w.Flush()
-		return printErr
+// check if a team is registered to prevent errors when entering data
+func CheckifReg(gameType, homeTeam, awayTeam string) error {
+	reader, readErr := csvmanager.ReadCsv(GetBaseTeamNames()+gameType+".csv", 0700, true, 20)
+	if readErr != nil {
+		return readErr
 	}
-	return nil
-}
-
-func CheckValidLen(gameType, homeTeam, awayTeam *string, data []Data) error {
-	if len(data) < 5 {
-		str := "Not enough registered fixtures between " + *homeTeam + " & " + *awayTeam + "!"
-		printErr := errors.New(str)
-		//path := "./insufficient/" + *gameType + ".txt"
-		//file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
-		//defer file.Close()
-		//w := bufio.NewWriter(file)
-		//fmt.Fprintf(w, "only %v fixtures for %s vs  %s are availble\n", len(data), *homeTeam, *awayTeam)
-		//w.Flush()
-		return printErr
+	teamNames := reader.Col("Teams").String()
+	if !slices.Contains(teamNames, homeTeam) {
+		return errors.New("invalid team names entered")
+	}
+	if !slices.Contains(teamNames, awayTeam) {
+		return errors.New("invalid team names entered")
 	}
 	return nil
 }
