@@ -40,12 +40,31 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 	but4 := widget.NewButtonWithIcon("search for Team Data", theme.SearchIcon(), func() {
 		w.SetContent(SearchWith1Team(w))
 	})
-	but5 := widget.NewButtonWithIcon("", theme.SearchIcon(), func() {
-		w.SetContent(RegisterGamehalfScores(w))
+	but5 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
+		w.SetContent(RegisterTeams(w))
 	})
 	grid := container.NewAdaptiveGrid(5, but1, but2, but3, but4, but5)
 
 	return grid
+}
+
+func RegisterTeams(w fyne.Window) fyne.CanvasObject {
+	radOptions := models.DirIterator(models.GetBase())
+	Select := widget.NewSelect(radOptions, func(s string) {
+	})
+
+	competitors := widget.NewEntry()
+	competitors.MultiLine = false
+	competitors.SetPlaceHolder("Add new team")
+	saveCompetitors := widget.NewButton("Add team", func() {
+		models.AddTeam(Select.Selected, competitors.Text)
+		entryDel(competitors)
+	})
+	exit := widget.NewButton("exit", func() {
+		w.SetContent(uiLoader(w))
+	})
+	hZ := container.NewBorder(Select, exit, nil, saveCompetitors, competitors)
+	return hZ
 }
 
 func Searchwith2Teams(w fyne.Window) fyne.CanvasObject {
@@ -107,6 +126,7 @@ func CreateNewGame(w fyne.Window) fyne.CanvasObject {
 	competitors.SetPlaceHolder("Add new team")
 	saveCompetitors := widget.NewButton("Add team", func() {
 		models.AddTeam(*store, competitors.Text)
+		entryDel(competitors)
 	})
 	exit := widget.NewButton("exit", func() {
 		w.SetContent(uiLoader(w))
