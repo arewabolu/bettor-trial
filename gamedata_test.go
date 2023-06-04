@@ -53,7 +53,7 @@ func TestCheckReader(t *testing.T) {
 }
 
 func TestMAchanges(t *testing.T) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", true)
+	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", 0644, true)
 	goals := models.SearchTeam(models.Sou, rds)
 	nwGoals := goals
 	med := models.Median(models.FloatCon(nwGoals))
@@ -69,7 +69,7 @@ func TestMAchanges(t *testing.T) {
 }
 
 func TestWriter(t *testing.T) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", true)
+	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", 0644, true)
 	team := models.Mci
 	goals := models.SearchTeam(team, rds)
 	nwGoals := models.FloatCon(goals)
@@ -106,7 +106,7 @@ func TestWriter(t *testing.T) {
 }
 
 func TestWins(t *testing.T) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", true)
+	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", 0644, true)
 	team1 := models.Mu
 	//team2 := models.Che
 	goals := models.SearchTeam(team1, rds)

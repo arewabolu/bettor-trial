@@ -17,10 +17,7 @@ func SaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *wid
 		HT1stHalf := ent[1].Text
 		HT2ndHalf := ent[2].Text
 		AT := ent[3].Text
-		AT1stHalf := ent[4].Text
-		AT2ndHalf := ent[5].Text
-
-		values := []string{HT, HT1stHalf, HT2ndHalf, AT, AT1stHalf, AT2ndHalf}
+		values := []string{HT, HT1stHalf, HT2ndHalf, AT}
 
 		if Select.Selected == "" {
 			dlog := dialog.NewError(errors.New("please select the game type"), w)

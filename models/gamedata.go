@@ -8,7 +8,7 @@ import (
 
 // combiner for readRecords and splitData
 func GetGames(gameType *string, homeTeam, awayTeam string) (validGames []Data) {
-	file, err := csvmanager.ReadCsv(GetBase()+*gameType+".csv", true, 400)
+	file, err := csvmanager.ReadCsv(GetBase()+*gameType+".csv", 0755, true, 400)
 	if err != nil {
 		fmt.Println(err)
 	}
