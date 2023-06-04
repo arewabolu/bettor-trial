@@ -55,7 +55,7 @@ func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
 
 		err := controller.CheckWriter(Select.Selected, values)
 		if err != nil {
-			dlog := dialog.NewError(errors.New("please select the game type"), w)
+			dlog := dialog.NewError(err, w)
 			dlog.Show()
 			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 				if ke.Name == fyne.KeyReturn {
@@ -92,6 +92,7 @@ func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
 	return fullCanvas
 }
 
+// deprecated: not implemented for usage
 func RegisterGamehalfScores(w fyne.Window) fyne.CanvasObject {
 	HTEnt := newSubmitEntry(w)
 	ATEnt := newSubmitEntry(w)

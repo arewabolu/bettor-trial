@@ -32,7 +32,7 @@ func SaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *wid
 
 		err := controller.CheckWriter(Select.Selected, values)
 		if err != nil {
-			dlog := dialog.NewError(errors.New("please select the game type"), w)
+			dlog := dialog.NewError(err, w)
 			dlog.Show()
 			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 				if ke.Name == fyne.KeyReturn {
