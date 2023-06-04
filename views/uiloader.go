@@ -103,11 +103,19 @@ func CreateNewGame(w fyne.Window) fyne.CanvasObject {
 	gameType := new(widget.Entry)
 	button := widget.NewButton("Create", func() {
 		models.CreateFile(gameType.Text)
+		models.CreateTeamsFile(gameType.Text)
+	})
+	//TODO: add new page as method of adding new teams
+	competitors := widget.NewEntry()
+	competitors.SetPlaceHolder("Add new team")
+	saveCompetitors := widget.NewButton("Add team", func() {
+		models.AddTeam(gameType.Text, competitors.Text)
 	})
 	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 		w.SetContent(uiLoader(w))
 	})
-	vBox := container.NewVBox(backButn, gameType, button)
+	hZ := container.NewBorder(nil, nil, nil, saveCompetitors, competitors)
+	vBox := container.NewVBox(backButn, gameType, hZ, button)
 	return vBox
 }
 

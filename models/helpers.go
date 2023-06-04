@@ -42,6 +42,12 @@ func GetBase() string {
 	return basedir
 }
 
+func GetBaseTeamNames() string {
+	home, _ := GetHome()
+	basedir := home + "/bettor/database/TeamName/"
+	return basedir
+}
+
 func PrepForRow(x []string, mean string) [][]string {
 	rowArr := make([][]string, 0, len(x))
 	for i := 0; i < len(x); i++ {

@@ -2,6 +2,7 @@ package models
 
 import (
 	"bufio"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"log"
@@ -58,7 +59,56 @@ func CreateFile(name string) error {
 	if name == "" {
 		return errors.New("please state the name of the file")
 	}
-	_, err := os.Create(GetBase() + name + ".csv")
+	file, err := os.OpenFile(GetBase()+name+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	wr := csv.NewWriter(file)
+	defer wr.Flush()
+
+	err = wr.Write([]string{"homeTeam", "awayTeam", "homeScore", "awayScore"})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CreateTeamsFile(gameName string) error {
+	if gameName == "" {
+		return errors.New("please state the name of the file")
+	}
+	file, err := os.OpenFile(GetBase()+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	wr := csv.NewWriter(file)
+	defer wr.Flush()
+
+	err = wr.Write([]string{"Teams"})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func AddTeam(gameName, teamName string) error {
+	if teamName == "" {
+		return errors.New("please state the name of the team")
+	}
+	file, err := os.OpenFile(GetBase()+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	wr := csv.NewWriter(file)
+	defer wr.Flush()
+
+	err = wr.Write([]string{teamName})
 	if err != nil {
 		return err
 	}

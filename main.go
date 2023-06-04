@@ -27,6 +27,10 @@ func makeDir() error {
 	if err != nil {
 		return err
 	}
+	err = os.MkdirAll(home+"/bettor/database/TeamName/", os.ModePerm)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
