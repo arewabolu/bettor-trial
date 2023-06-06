@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/arewabolu/csvmanager"
 )
@@ -93,6 +94,36 @@ func SearchTeam2(team string, data csvmanager.Frame) (homeGoals []int, awayGoals
 		}
 	}
 	return
+}
+
+func SearcherV2(gameType string, team, status string) (float64, float64) {
+	rds, _ := csvmanager.ReadCsv(GetBase()+gameType+".csv", 0755, true, 400)
+	team = strings.ToUpper(team)
+	teamGoals := SearchTeam(team, rds)
+	teamGoalsFloat := FloatCon(teamGoals)
+	goalsAgainst := SearchTeam3(team, rds)
+	goalsAgainstFLoat := FloatCon(goalsAgainst)
+	multiStatus := StatusAllocator(rds, team)
+
+	var statusInt float64
+	if status == "home" { //, "away"
+		statusInt = 1
+	} else {
+		statusInt = 0
+	}
+
+	TD := &TeamData{
+		GoalFor:     teamGoalsFloat,
+		GoalAgainst: goalsAgainstFLoat,
+		Status:      FloatCon(multiStatus),
+	}
+	r, MAE := TrainAndTest(TD)
+	xG := AveragexGFCalc(statusInt, r, TD, 30)
+	if xG == 0 {
+		MAE = 0
+	}
+	return xG, MAE
+
 }
 
 // returns opponents goals for a single team

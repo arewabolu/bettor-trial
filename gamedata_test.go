@@ -212,7 +212,7 @@ func TestSearcherV2(t *testing.T) {
 	//team1 := models.Bay
 
 	for _, team := range teams {
-		xG, _ := controller.SearcherV2(game, team, "home")
+		xG, _ := models.SearcherV2(game, team, "home")
 		t.Error(team, " : ", xG)
 	}
 }
