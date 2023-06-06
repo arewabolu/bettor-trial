@@ -43,34 +43,35 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, 
 	return
 }
 
-func SearcherV2(gameType string, team, status string) (float64, float64) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", 0755, true, 400)
-	team = strings.ToUpper(team)
-	teamGoals := models.SearchTeam(team, rds)
-	teamGoalsFloat := models.FloatCon(teamGoals)
-	goalsAgainst := models.SearchTeam3(team, rds)
-	goalsAgainstFLoat := models.FloatCon(goalsAgainst)
-	multiStatus := models.StatusAllocator(rds, team)
-
-	var statusInt float64
-	if status == "home" { //, "away"
-		statusInt = 1
-	} else {
-		statusInt = 0
+func GenRating(gameType string) error {
+	data, err := csvmanager.ReadCsv(models.GetBase()+gameType+".csv", 0755, true)
+	if err != nil {
+		return errors.New("could not generate game info")
 	}
+	rows := data.Rows()
 
-	TD := &models.TeamData{
-		GoalFor:     teamGoalsFloat,
-		GoalAgainst: goalsAgainstFLoat,
-		Status:      models.FloatCon(multiStatus),
+	for _, game := range rows {
+		match := game.String()
+		homeGoal, err := strconv.Atoi(match[2])
+		if err != nil {
+			return err
+		}
+		awayGoal, err := strconv.Atoi(match[3])
+		if err != nil {
+			return err
+		}
+		WritePi(gameType, match[0], match[1], homeGoal, awayGoal)
 	}
-	r, MAE := models.TrainAndTest(TD)
-	xG := models.AveragexGFCalc(statusInt, r, TD, 30)
-	if xG == 0 {
-		MAE = 0
-	}
-	return xG, MAE
+	return nil
+}
 
+// WritePi is a wrapper around UpdateTeamRatings
+func WritePi(gameType, homeTeam, awayTeam string, homeScore, awayScore int) error {
+	err := pi.UpdateTeamRatings(models.GetBaseGameType("ratings", gameType), homeTeam, awayTeam, homeScore, awayScore)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func WriteMatchData(gameType string, data2Reg []string) (err error) {
@@ -86,19 +87,17 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	if err != nil {
 		return err
 	}
-	if gameType == "fifa4x4Eng" {
-		homeScoreInt, err := strconv.Atoi(data2Reg[2])
-		if err != nil {
-			return errors.New("please fill correct entry")
-		}
-		awayScoreInt, err := strconv.Atoi(data2Reg[3])
-		if err != nil {
-			return errors.New("please fill correct entry")
-		}
-		err = pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa4x4Eng.csv", data2Reg[2], data2Reg[3], homeScoreInt, awayScoreInt)
-		if err != nil {
-			return err
-		}
+	homeScoreInt, err := strconv.Atoi(data2Reg[2])
+	if err != nil {
+		return errors.New("please fill correct entry")
+	}
+	awayScoreInt, err := strconv.Atoi(data2Reg[3])
+	if err != nil {
+		return errors.New("please fill correct entry")
+	}
+	err = WritePi("fifa4x4Eng", data2Reg[2], data2Reg[3], homeScoreInt, awayScoreInt)
+	if err != nil {
+		return errors.New("please fill correct entry")
 	}
 	file, err := os.OpenFile(models.GetBase()+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {

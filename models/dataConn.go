@@ -92,8 +92,27 @@ func CreateTeamsFile(gameName string) error {
 	}
 	return nil
 }
+func CreateRatingFile(gameName string) error {
+	if gameName == "" {
+		return errors.New("please state the name of the file")
+	}
+	file, err := os.OpenFile(GetBaseRating()+"ratings"+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
-func AddTeam(gameName, teamName string) error {
+	wr := csv.NewWriter(file)
+	defer wr.Flush()
+
+	err = wr.Write([]string{"TeamName", "HomeRating", "AwayRating", "ContinuousHomePerformance", "ContinuousAwayPerformance"})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func AddToTeam(gameName, teamName string) error {
 	teamName = strings.ToUpper(strings.TrimSpace(teamName))
 	if teamName == "" {
 		return errors.New("please state the name of the team")
@@ -118,6 +137,31 @@ func AddTeam(gameName, teamName string) error {
 	return nil
 }
 
+func AddtoRating(gameName, teamName string) error {
+	teamName = strings.ToUpper(strings.TrimSpace(teamName))
+	if teamName == "" {
+		return errors.New("please state the name of the team")
+	}
+	_, err := os.Stat(GetBaseRating() + "ratings" + gameName + ".csv")
+	if errors.Is(err, os.ErrNotExist) {
+		CreateRatingFile(gameName)
+	}
+	file, err := os.OpenFile(GetBaseRating()+"ratings"+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	wr := csv.NewWriter(file)
+	defer wr.Flush()
+
+	err = wr.Write([]string{teamName, "0", "0", "0", "0"})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // check if a team is registered to prevent errors when entering data
 func CheckifReg(gameType, homeTeam, awayTeam string) error {
 	_, err := os.Stat(GetBaseTeamNames() + gameType + ".csv")
@@ -130,7 +174,7 @@ func CheckifReg(gameType, homeTeam, awayTeam string) error {
 	}
 	teamNames := reader.Col("Teams").String()
 	if len(teamNames) < 1 {
-		return errors.New("No teams currently registered")
+		return errors.New("no teams currently registered. please update teams for league")
 	}
 	if !slices.Contains(teamNames, homeTeam) {
 		return errors.New("invalid home team entered")

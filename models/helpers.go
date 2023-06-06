@@ -48,6 +48,17 @@ func GetBaseTeamNames() string {
 	return basedir
 }
 
+func GetBaseRating() string {
+	home, _ := GetHome()
+	basedir := home + "/bettor/database/ratings/"
+	return basedir
+}
+
+func GetBaseGameType(defaultFolder, gametype string) string {
+	basedir := GetBase() + defaultFolder + gametype + ".csv"
+	return basedir
+}
+
 func PrepForRow(x []string, mean string) [][]string {
 	rowArr := make([][]string, 0, len(x))
 	for i := 0; i < len(x); i++ {
