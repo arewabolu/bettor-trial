@@ -9,7 +9,6 @@ import (
 
 	"github.com/arewabolu/csvmanager"
 	"golang.org/x/exp/slices"
-	"gonum.org/v1/gonum/stat"
 )
 
 // Avl
@@ -197,31 +196,12 @@ func DirIterator(basedir string) []string {
 	return nameSlice
 }
 
-func TeamAvgs(f csvmanager.Frame) (float64, float64) {
-	HMGl := SearchTeam("MCI", f)
-	meanTeamC := stat.CircularMean(FloatCon(HMGl), nil)
-	meanTeam := stat.Mean(FloatCon(HMGl), nil)
-	//HS := rds.Col("homeScore").Float()
-	//AS := rds.Col("awayScore").Float()
-	//mean, _ := stat.MeanVariance(HS, nil)
-	//mean2, _ := stat.MeanVariance(AS, nil)
-	return meanTeam, meanTeamC
-}
-
 func FloatCon(slice []int) []float64 {
 	floatSli := make([]float64, 0)
 	for _, input := range slice {
 		floatSli = append(floatSli, float64(input))
 	}
 	return floatSli
-}
-
-func MeanDiff(x []float64, mean float64) []float64 {
-	diff := make([]float64, 0, len(x))
-	for index := range x {
-		diff = append(diff, x[index]-mean)
-	}
-	return diff
 }
 
 func FloattoString(x []float64) []string {
