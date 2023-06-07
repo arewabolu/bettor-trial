@@ -12,6 +12,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// TODO: deprecate search functions and then implement pi-rating search,
+// also an idea is to create a bayesian model that generates random numbers between 1 and 5
 func AppStart() {
 	app := &appController{
 		application: app.NewWithID("com.example.myid"),
@@ -33,7 +35,7 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 		w.SetContent(RegisterGameFullScore(w))
 	})
 	but3 := widget.NewButtonWithIcon("search for game", theme.SearchIcon(), func() {
-		w.SetContent(Searchwith2Teams(w))
+		w.SetContent(PiSearch(w))
 	})
 	but4 := widget.NewButtonWithIcon("search for Team Data", theme.SearchIcon(), func() {
 		w.SetContent(SearchWith1Team(w))
@@ -73,7 +75,6 @@ func RegisterTeams(w fyne.Window) fyne.CanvasObject {
 	exit := widget.NewButton("exit", func() {
 		w.SetContent(uiLoader(w))
 	})
-
 	hZ := container.NewBorder(nil, exit, nil, nil, competitors, saveCompetitors)
 	Vcont := container.NewVBox(Select, hZ, cont)
 	return Vcont
