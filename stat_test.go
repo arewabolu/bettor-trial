@@ -2,6 +2,7 @@ package main
 
 import (
 	"bettor/models"
+	"math"
 	"strconv"
 	"testing"
 
@@ -148,4 +149,65 @@ func TestSingles(t *testing.T) {
 	ratingA := (aT.HomeRating + aT.AwayRating) / 2
 
 	t.Error(home, ":", ratingH, awat, ":", ratingA, ratingH-ratingA)
+}
+
+// RESULTS: Betting on expected Goal difference produced drastically lower returns than betting on rating difference
+func TestSearchWithPixG(t *testing.T) {
+	inv := &invests{balance: 200, stake: 50, odds: 1.35}
+
+	games := []models.Data{
+		{Home: models.Avl, Away: models.Wol, HomeScore: 2, AwayScore: 1},
+		{Home: models.Wat, Away: models.Tot, HomeScore: 1, AwayScore: 4},
+		{Home: models.Nor, Away: "MU", HomeScore: 3, AwayScore: 3},
+		{Home: "SOU", Away: "ARS", HomeScore: 0, AwayScore: 5},
+		{Home: "ARS", Away: "NU", HomeScore: 5, AwayScore: 0},
+		{Home: "MU", Away: "SOU", HomeScore: 3, AwayScore: 1},
+		{Home: "TOT", Away: "NOR", HomeScore: 2, AwayScore: 1},
+		{Home: "WOL", Away: "WAT", HomeScore: 3, AwayScore: 1},
+		{Home: "LIV", Away: "AVL", HomeScore: 3, AwayScore: 2},
+		{Home: "BUR", Away: "MCI", HomeScore: 0, AwayScore: 4},
+		{Home: "EVE", Away: "WHU", HomeScore: 4, AwayScore: 1},
+		{Home: "LU", Away: "BRE", HomeScore: 1, AwayScore: 1},
+		{Home: "LEI", Away: "BHA", HomeScore: 3, AwayScore: 1},
+		{Home: "CHE", Away: "CRY", HomeScore: 1, AwayScore: 2},
+		{Home: "NU", Away: "CRY", HomeScore: 1, AwayScore: 2},
+		{Home: "BHA", Away: "CHE", HomeScore: 2, AwayScore: 3},
+		{Home: "BRE", Away: "LEI", HomeScore: 1, AwayScore: 3},
+		{Home: "WHU", Away: "LU", HomeScore: 2, AwayScore: 1},
+		{Home: "MCI", Away: "EVE", HomeScore: 3, AwayScore: 1},
+		{Home: "AVL", Away: "BUR", HomeScore: 1, AwayScore: 3},
+		{Home: "WAT", Away: "LIV", HomeScore: 3, AwayScore: 2},
+		{Home: "NOR", Away: "WOL", HomeScore: 2, AwayScore: 3},
+		{Home: "SOU", Away: "TOT", HomeScore: 1, AwayScore: 2},
+		{Home: "ARS", Away: "MU", HomeScore: 3, AwayScore: 2},
+		{Home: "MU", Away: "NU", HomeScore: 4, AwayScore: 0},
+		{Home: "TOT", Away: "ARS", HomeScore: 3, AwayScore: 0},
+		{Home: "WOL", Away: "SOU", HomeScore: 1, AwayScore: 2},
+		{Home: "LIV", Away: "NOR", HomeScore: 5, AwayScore: 1},
+		{Home: "BUR", Away: "WAT", HomeScore: 2, AwayScore: 1},
+		{Home: "EVE", Away: "AVL", HomeScore: 2, AwayScore: 1},
+	}
+	var win, loss int
+	for _, test := range games {
+		hT := pi.Search(models.GetBaseGameType("ratings", "ratingsfifa22Eng"), test.Home, "home")
+		aT := pi.Search(models.GetBaseGameType("ratings", "ratingsfifa22Eng"), test.Away, "away")
+		homexG := pi.ExpectedGoalIndividual(hT.HomeRating)
+		awayxG := pi.ExpectedGoalIndividual(aT.AwayRating)
+		xG := pi.ExpectedGoalDifference(homexG, awayxG)
+		GD := test.HomeScore - test.AwayScore
+		t.Error(math.Ceil(xG))
+		switch {
+		case math.Ceil(xG) >= float64(GD):
+			win++
+			inv.bet()
+			t.Error("after win:", inv.balance)
+
+		case math.Ceil(xG) < float64(GD):
+			loss++
+			inv.betLoss()
+			t.Error("after loss:", inv.balance)
+		}
+	}
+	t.Error(win, loss, len(games), inv.balance)
+
 }
