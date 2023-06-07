@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	github.com/arewabolu/pi-rating v0.0.7
+	github.com/arewabolu/pi-rating v0.0.8
 	github.com/go-text/typesetting v0.0.0-20230520134535-86265021ae8e // indirect
 )
 
