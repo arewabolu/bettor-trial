@@ -95,7 +95,7 @@ func CreateRatingFile(gameName string) error {
 	if gameName == "" {
 		return errors.New("please state the name of the file")
 	}
-	file, err := os.OpenFile(GetBaseRating()+"ratings"+gameName+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
+	file, err := os.OpenFile(GetBaseGameType("ratings", gameName), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		return err
 	}
