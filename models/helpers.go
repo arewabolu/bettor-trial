@@ -15,13 +15,6 @@ import (
 //	}
 //}
 
-func sumArray(arr []int) (sumMedium int) {
-	for _, item := range arr {
-		sumMedium = sumMedium + item
-	}
-	return sumMedium
-}
-
 // Deprecated: Use CheckifReg instead
 func CheckRegisteredTeams(homeTeam, awayTeam string) error {
 	teamArr := []string{Avl, Ars, Bha, Bre, Bur, Che, Cry, Eve, Lei, Liv, Lu, Mci, Mu, Nor, Nu, Sou, Tot, Wat, Whu, Wol, Bar, Bay, Juv, Rma, Psg}
