@@ -48,7 +48,7 @@ func GetBaseRating() string {
 }
 
 func GetBaseGameType(defaultFolder, gametype string) string {
-	basedir := GetBase() + defaultFolder + "/" + gametype + ".csv"
+	basedir := GetBase() + defaultFolder + "/" + defaultFolder + gametype + ".csv"
 	return basedir
 }
 
