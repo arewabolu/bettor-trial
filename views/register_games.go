@@ -48,6 +48,7 @@ func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
 			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 				if ke.Name == fyne.KeyReturn {
 					dlog.Hide()
+					w.RequestFocus()
 				}
 			})
 			return
@@ -60,6 +61,7 @@ func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
 			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 				if ke.Name == fyne.KeyReturn {
 					dlog.Hide()
+					w.RequestFocus()
 				}
 			})
 		}
