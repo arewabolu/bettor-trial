@@ -32,10 +32,6 @@ func CheckReader(gameType string, gameValues []string) (float64, float64, error)
 }
 
 func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, err error) {
-	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
-	//if err != nil {
-	//	return nil, err
-	//} and
 	games := models.GetGames(&gameType, homeTeam, awayTeam)
 	err = models.CheckifReg(gameType, homeTeam, awayTeam)
 	if err != nil {
@@ -100,15 +96,15 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	}
 	homeScoreInt, err := strconv.Atoi(data2Reg[2])
 	if err != nil {
-		return errors.New("please fill correct entry")
+		return errors.New("please fill correct hometeam score")
 	}
 	awayScoreInt, err := strconv.Atoi(data2Reg[3])
 	if err != nil {
-		return errors.New("please fill correct entry")
+		return errors.New("please fill correct awayteam score")
 	}
-	err = WritePi("fifa4x4Eng", data2Reg[2], data2Reg[3], homeScoreInt, awayScoreInt)
+	err = WritePi(gameType, data2Reg[0], data2Reg[1], homeScoreInt, awayScoreInt)
 	if err != nil {
-		return errors.New("please fill correct entry")
+		return errors.New("cannot update Pi")
 	}
 	file, err := os.OpenFile(models.GetBase()+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
