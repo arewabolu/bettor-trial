@@ -12,8 +12,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-// TODO: deprecate search functions and then implement pi-rating search,
 // also an idea is to create a bayesian model that generates random numbers between 1 and 5
+// Can use the os.StartProcess function to start a new process check os/exec
 func AppStart() {
 	app := &appController{
 		application: app.NewWithID("com.example.myid"),

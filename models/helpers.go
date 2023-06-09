@@ -52,14 +52,6 @@ func GetBaseGameType(defaultFolder, gametype string) string {
 	return basedir
 }
 
-func PrepForRow(x []string, mean string) [][]string {
-	rowArr := make([][]string, 0, len(x))
-	for i := 0; i < len(x); i++ {
-		rowArr = append(rowArr, []string{x[i], mean})
-	}
-	return rowArr
-}
-
 func StatusAllocator(rds csvmanager.Frame, team string) []int {
 	status := make([]int, 0)
 

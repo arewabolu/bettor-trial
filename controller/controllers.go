@@ -21,7 +21,6 @@ func CheckWriter(flagValue string, flagArgs []string) error {
 	return err
 }
 
-// DEPRECATED: Use
 func CheckReader(gameType string, gameValues []string) (float64, float64, error) {
 	homeTeam := strings.ToUpper(gameValues[0])
 	awayTeam := strings.ToUpper(gameValues[1])
