@@ -4,17 +4,20 @@ import (
 	"bettor/controller"
 	"bettor/models"
 	"bettor/views"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 
+	"github.com/arewabolu/csvmanager"
 	"golang.org/x/exp/slices"
 )
 
 var (
-	advantage bool
 	register  string
 	search    string
+	listTeams string
+	list      bool
 )
 
 func makeDir() error {
@@ -40,49 +43,56 @@ func init() {
 	if err != nil {
 		os.Exit(1)
 	}
-	flag.BoolVar(&advantage, "adv", false, "To check what teams have an advantage")
-	flag.StringVar(&register, "reg", "", "used to register all games(penalties and mathces)")
-	flag.StringVar(&search, "search", "", "used to search for match results")
+
+	help := fmt.Sprintln("First argument to any of the flags must be a registered game type e.g fifa22Eng, fifa18Pen")
+	flag.StringVar(&register, "r", "", help+"used to register all games(penalties and mathces)")
+	flag.StringVar(&search, "s", "", "used to search for match results")
+	flag.StringVar(&listTeams, "lt", "", "list all teams of a game")
+	flag.BoolVar(&list, "l", false, "list all registered games")
 }
 
 func main() {
 	flag.Parse()
-	//check how many distinct games exist and also how many repetitve games exist
-	// implement flags today -s -n -agg -h
-	// function that takes all games of one team and returns their gpg ratio
-	//also function to return individual totals per game for home and away team
 	args := flag.Args()
-	//app :=
-	flagValues := []string{"4x4", "pen18", "pen22"}
-	switch {
-	case len(args) == 0:
-		views.AppStart()
-	case slices.Contains(flagValues, register):
+	flagValues := models.DirIterator(models.GetBase())
 
-		retStr := controller.CheckWriter(register, args)
-		fmt.Println(retStr)
+	if list {
+		fmt.Fprintln(os.Stdout, flagValues)
+		return
+	}
+	switch {
+	case slices.Contains(flagValues, register):
+		err := controller.CheckWriter(register, args)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
 
 	case slices.Contains(flagValues, search):
-	//	_, even, odd, err := controller.CheckReader(search, args)
-	//	if err != nil {
-	//		fmt.Println(err)
-	//		return
-	//	}
-
-	//fmt.Printf("%s win percentage %.2f\n", flag.Arg(0), percentageWinorDraw[0])
-	//	fmt.Printf("%s win percentage %.2f\n", flag.Arg(1), percentageWinorDraw[1])
-	//	fmt.Printf("draw percentage %.2f\n", percentageWinorDraw[2])
-
-	//	if search == flagValues[0] {
-	//	fmt.Printf("There's a %.2f of both teams scoring over 6 goal(s)\n", goals[0])
-	//	fmt.Printf("There's a %.2f of both teams scoring over 7 goal(s)\n", goals[1])
-	//	fmt.Printf("There's a %.2f of both teams scoring over 8 goal(s)\n", goals[2])
-	//	} else {
-	//		fmt.Printf("There's a %.2f of both teams scoring 1 goal(s)\n", goals[0])
-	//		fmt.Printf("There's a %.2f of both teams scoring 2 goal(s)\n", goals[1])
-	//		fmt.Printf("There's a %.2f of both teams scoring 3 goal(s)\n", goals[2])
-	//	}
-
+		homeRating, AwayRating, err := controller.CheckReader(search, args)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+		fmt.Fprintf(os.Stdout, "home: %.4f\naway:  %.4f\n", homeRating, AwayRating)
+	case slices.Contains(flagValues, listTeams):
+		_, err := os.Stat(models.GetBaseTeamNames() + listTeams + ".csv")
+		if errors.Is(err, os.ErrNotExist) {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+		reader, readErr := csvmanager.ReadCsv(models.GetBaseTeamNames()+listTeams+".csv", 0700, true, 20)
+		if readErr != nil {
+			fmt.Fprintln(os.Stderr, readErr)
+			return
+		}
+		teamNames := reader.Col("Teams").String()
+		if len(teamNames) < 1 {
+			fmt.Fprintln(os.Stderr, errors.New("no teams currently registered. please update teams for league"))
+		}
+		fmt.Fprintln(os.Stdout, teamNames)
+	case len(args) == 0:
+		views.AppStart()
 	default:
 		fmt.Println("the value of your flag is incorrect,please confirm")
 	}
@@ -93,12 +103,6 @@ func main() {
 // both teams to score x or more
 // percentage of wins,draws and losses against current opponent
 // percentage/likeliness of wins,draws and losses against other opponent
-//goals for and goals against
-//does home or away have the advantage for games
+// does home or away have the advantage for games
 // future features registers for reallife games (scores, corners, goalkicks, throw-ins e.t.c)
 //even or odd scores
-
-//move database registrars and callers to another file
-//seperate get aggregate verbose for diff files
-//handle conditionals and return values(change to nil)
-//if pen check the scores. it must not be equal
