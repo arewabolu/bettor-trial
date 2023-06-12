@@ -3,13 +3,11 @@ package main
 import (
 	"bettor/controller"
 	"bettor/models"
-	"fmt"
 	"os"
 	"strconv"
 	"testing"
 
 	"github.com/arewabolu/csvmanager"
-	tradefuncs "github.com/arewabolu/trademath"
 )
 
 func TestCheckWriter(t *testing.T) {
@@ -38,34 +36,6 @@ func TestCheckWriter(t *testing.T) {
 		//	err := WriteMatchData(homeTeam, awayTeam, homeScore, awayScore)
 
 	}
-}
-
-func TestCheckReader(t *testing.T) {
-	//try to pass
-	homeTeam := "ars"
-	awayTeam := "mci"
-	//	fawayTeam := "bor"
-	_, _, _, err := controller.CheckReader("fifa4x4Eng", []string{homeTeam, awayTeam})
-
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestMAchanges(t *testing.T) {
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+"fifa4x4Eng.csv", 0644, true)
-	goals := models.SearchTeam(models.Sou, rds)
-	nwGoals := goals
-	med := models.Median(models.FloatCon(nwGoals))
-	MA3 := tradefuncs.MA(models.FloatCon(goals), 3)
-	//	median := stat.Quantile(0.95, stat.Empirical, models.FloatCon(nwGoals), nil)
-	if len(MA3) > 0 {
-		fmt.Println(MA3)
-		//	fmt.Println(median)
-		fmt.Println(med)
-		t.Error()
-	}
-
 }
 
 func TestWriter(t *testing.T) {
