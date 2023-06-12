@@ -25,8 +25,11 @@ func CheckReader(gameType string, gameValues []string) (float64, float64, error)
 	homeTeam := strings.ToUpper(gameValues[0])
 	awayTeam := strings.ToUpper(gameValues[1])
 	err := models.CheckifReg(gameType, homeTeam, awayTeam)
+	if err != nil {
+		return 0, 0, err
+	}
 	//GP, even, odd, err = ReadMatch(gameType, homeTeam, awayTeam)
-	ratingH, ratingA := ReadPi(gameType, homeTeam, awayTeam)
+	ratingH, ratingA, err := ReadPi(gameType, homeTeam, awayTeam)
 	return ratingH, ratingA, err
 }
 
@@ -41,12 +44,18 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, 
 	return
 }
 
-func ReadPi(gameType, home, away string) (float64, float64) {
-	hT := pi.Search(models.GetBaseGameType("ratings", gameType), home, "home")
-	aT := pi.Search(models.GetBaseGameType("ratings", gameType), away, "away")
+func ReadPi(gameType, home, away string) (float64, float64, error) {
+	hT, err := pi.Search(models.GetBaseGameType("ratings", gameType), home, "home")
+	if err != nil {
+		return 0, 0, err
+	}
+	aT, err := pi.Search(models.GetBaseGameType("ratings", gameType), away, "away")
+	if err != nil {
+		return 0, 0, err
+	}
 	ratingH := (hT.HomeRating + hT.AwayRating) / 2
 	ratingA := (aT.HomeRating + aT.AwayRating) / 2
-	return ratingH, ratingA
+	return ratingH, ratingA, nil
 }
 
 func GenRating(gameType string) error {
