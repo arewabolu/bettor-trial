@@ -50,10 +50,8 @@ github.com/arewabolu/GoHaskell v0.0.5 h1:6Out2nsMex3X7Y8hcV8iN90hOL5tCktzKLX2hMN
 github.com/arewabolu/GoHaskell v0.0.5/go.mod h1:khrj7nU7ytM2hOg/YsKlTw0ISyiiVuIViFMcTcAHrug=
 github.com/arewabolu/csvmanager v1.4.14 h1:4Y/b03tq5FLrHZgxRkoCj/+VEJnYtGFSM4JhgO3r7PY=
 github.com/arewabolu/csvmanager v1.4.14/go.mod h1:/JY378TNOWjSUkfV8Ga7RkUA8TMDnM03EuhOaZacVP4=
-github.com/arewabolu/pi-rating v0.0.8 h1:U28UZFCj0h0lNgVdKd1B0m1hwoIe/uR6YQNajdsEDxo=
-github.com/arewabolu/pi-rating v0.0.8/go.mod h1:U40t1AQeDsX/H2EyxJR+ZxctDN0nVTcvSnDXp1TgSN0=
-github.com/arewabolu/trademath v0.0.5 h1:LhvPgAOUcmQ944YI3SutjGwyHlEOjyHk81dp76gti2s=
-github.com/arewabolu/trademath v0.0.5/go.mod h1:KYfcJBKOrjO73cIlUiOPGVohLANBNtwKY9zjxMAhAMU=
+github.com/arewabolu/pi-rating v0.0.10 h1:WHNXipnFT9RSca6Rri2ZP+zPKAseL4S53g8C9vZVCL8=
+github.com/arewabolu/pi-rating v0.0.10/go.mod h1:U40t1AQeDsX/H2EyxJR+ZxctDN0nVTcvSnDXp1TgSN0=
 github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hCbHZ8TKRvWD2dDTCfh9M9ya+I9JpbB7O8o=
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=

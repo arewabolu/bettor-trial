@@ -5,14 +5,13 @@ go 1.20
 require (
 	fyne.io/fyne/v2 v2.3.4
 	github.com/arewabolu/csvmanager v1.4.14
-	github.com/arewabolu/trademath v0.0.5
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	gonum.org/v1/gonum v0.13.0
 
 )
 
 require (
-	github.com/arewabolu/pi-rating v0.0.8
+	github.com/arewabolu/pi-rating v0.0.10
 	github.com/go-text/typesetting v0.0.0-20230520134535-86265021ae8e // indirect
 )
 
