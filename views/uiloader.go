@@ -30,7 +30,7 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 		w.SetContent(CreateNewGame(w))
 	})
 	//width := but1.Size().Width
-	//but1.Resize(fyne.NewSize(width, 20))
+	//but1.Resize(fyne.NewSize(40, 40))
 	but2 := widget.NewButtonWithIcon("register new Game", theme.ContentAddIcon(), func() {
 		w.SetContent(RegisterGameFullScore(w))
 	})
@@ -43,7 +43,7 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 	but5 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
 		w.SetContent(RegisterTeams(w))
 	})
-	grid := container.NewAdaptiveGrid(5, but1, but2, but3, but4, but5)
+	grid := container.NewGridWithRows(5, but1, but2, but3, but4, but5)
 
 	return grid
 }
