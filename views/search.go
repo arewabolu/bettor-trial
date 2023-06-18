@@ -101,12 +101,14 @@ func PiSearch(w fyne.Window) fyne.CanvasObject {
 		}
 		team1 := widget.NewLabel(fmt.Sprintf("%s:	%.4f", values[0], ratingH))
 		team2 := widget.NewLabel(fmt.Sprintf("%s:	%.4f", values[1], ratingA))
+		RD := widget.NewLabel(fmt.Sprintf("%s:	%.4f", "rating difference", ratingH-ratingA))
 		backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 			Box.RemoveAll()
 			w.SetContent(PiSearch(w))
 		})
 
-		w.SetContent(container.NewVBox(backButn, team1, team2))
+		teamsInfo := container.NewVBox(backButn, team1, team2, RD)
+		w.SetContent(container.NewBorder(teamsInfo, nil, nil, nil, makeImage(w)))
 
 	}
 
