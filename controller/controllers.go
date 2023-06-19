@@ -53,9 +53,8 @@ func ReadPi(gameType, home, away string) (float64, float64, error) {
 	if err != nil {
 		return 0, 0, err
 	}
-	ratingH := (hT.HomeRating + hT.AwayRating) / 2
-	ratingA := (aT.HomeRating + aT.AwayRating) / 2
-	return ratingH, ratingA, nil
+
+	return hT.HomeRating, aT.AwayRating, nil
 }
 
 func GenRating(gameType string) error {

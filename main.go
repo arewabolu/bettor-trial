@@ -26,13 +26,13 @@ func makeDir() error {
 	if homeDirErr != nil {
 		return homeDirErr
 	}
-	err := os.MkdirAll(home+"/bettor/database/", os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(home+"/bettor/database/TeamName/", os.ModePerm)
-	if err != nil {
-		return err
+	folders := []string{models.GetBase(), models.GetBaseTeamNames(), models.GetBaseRating(), "/bettor/database/probability/"}
+
+	for _, folder := range folders {
+		err := os.MkdirAll(home+folder, os.ModePerm)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -74,7 +74,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
-		fmt.Fprintf(os.Stdout, "home: %.4f\naway:  %.4f\n", homeRating, AwayRating)
+		fmt.Fprintf(os.Stdout, "home: %.4f\naway:  %.4f\nRating discrepancy: %.4f\n", homeRating, AwayRating, (homeRating - AwayRating))
 	case slices.Contains(flagValues, listTeams):
 		_, err := os.Stat(models.GetBaseTeamNames() + listTeams + ".csv")
 		if errors.Is(err, os.ErrNotExist) {
