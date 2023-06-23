@@ -8,12 +8,11 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
-func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
+func registerGameFullScore(w fyne.Window) fyne.CanvasObject {
 	HTEnt := newSubmitEntry(w)
 	ATEnt := newSubmitEntry(w)
 	HTSEnt := newSubmitEntry(w)
@@ -47,8 +46,8 @@ func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
 			dlog.Show()
 			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 				if ke.Name == fyne.KeyReturn {
+					defer w.Canvas().Focus(HTEnt)
 					dlog.Hide()
-					w.RequestFocus()
 				}
 			})
 			return
@@ -60,8 +59,8 @@ func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
 			dlog.Show()
 			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
 				if ke.Name == fyne.KeyReturn {
+					defer w.Canvas().Focus(HTEnt)
 					dlog.Hide()
-					w.RequestFocus()
 				}
 			})
 		}
@@ -88,67 +87,6 @@ func RegisterGameFullScore(w fyne.Window) fyne.CanvasObject {
 		case fyne.KeyReturn:
 			w.Canvas().Focus(submit)
 			saveFunc()
-		}
-
-	})
-	return fullCanvas
-}
-
-// deprecated: not implemented for usage
-func RegisterGamehalfScores(w fyne.Window) fyne.CanvasObject {
-	HTEnt := newSubmitEntry(w)
-	ATEnt := newSubmitEntry(w)
-	HT1stHalf := newSubmitEntry(w)
-	AT1stHalf := newSubmitEntry(w)
-	HT2ndHalf := newSubmitEntry(w)
-	AT2ndHalf := newSubmitEntry(w)
-
-	HTLabel := widget.NewLabel("Home team:")
-	ATLabel := widget.NewLabel("Away team:")
-	HT1stHalfLabel := widget.NewLabel("Home teams firs-thalf Score")
-	AT1stHalfLabel := widget.NewLabel("Away team first-half Score:")
-	HT2ndHalfLabel := widget.NewLabel("Home teams second-half Score")
-	AT2ndHalfLabel := widget.NewLabel("Away team second-half Score:")
-
-	HTHBox := container.NewBorder(nil, nil, HTLabel, nil, HTEnt)
-	ATHBox := container.NewBorder(nil, nil, ATLabel, nil, ATEnt)
-	HT1stHalfHBox := container.NewBorder(nil, nil, HT1stHalfLabel, nil, HT1stHalf)
-	AT1stHalfHBox := container.NewBorder(nil, nil, AT1stHalfLabel, nil, AT1stHalf)
-	HT2ndHalfHBox := container.NewBorder(nil, nil, HT2ndHalfLabel, nil, HT2ndHalf)
-	AT2ndHalfHBox := container.NewBorder(nil, nil, AT2ndHalfLabel, nil, AT2ndHalf)
-	ent := []*widget.Entry{&HTEnt.Entry, &HT1stHalf.Entry, &HT2ndHalf.Entry, &ATEnt.Entry, &AT1stHalf.Entry, &AT2ndHalf.Entry}
-
-	submit := SaveButton2(w, ent...)
-	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
-		w.SetContent(uiLoader(w))
-	})
-
-	fullCanvas := container.NewVBox(backButn, HTHBox, ATHBox, HT1stHalfHBox, AT1stHalfHBox, HT2ndHalfHBox, AT2ndHalfHBox, submit)
-
-	HTEnt.button = submit
-	ATEnt.button = submit
-	HT1stHalf.button = submit
-	HT2ndHalf.button = submit
-	AT1stHalf.button = submit
-	AT2ndHalf.button = submit
-
-	w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-		switch ke.Name {
-		case fyne.Key1:
-			w.Canvas().Focus(HTEnt)
-		case fyne.KeyF2:
-			w.Canvas().Focus(HT1stHalf)
-		case fyne.KeyF3:
-			w.Canvas().Focus(HT2ndHalf)
-		case fyne.KeyF4:
-			w.Canvas().Focus(ATEnt)
-		case fyne.KeyF5:
-			w.Canvas().Focus(AT1stHalf)
-		case fyne.KeyF6:
-			w.Canvas().Focus(AT2ndHalf)
-		case fyne.KeyReturn:
-			w.Canvas().Focus(submit)
-			test.Tap(submit)
 		}
 
 	})

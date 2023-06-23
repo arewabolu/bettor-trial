@@ -31,29 +31,26 @@ func AppStart() {
 
 func uiLoader(w fyne.Window) fyne.CanvasObject {
 	but1 := widget.NewButtonWithIcon("create new category", theme.ContentAddIcon(), func() {
-		w.SetContent(CreateNewGame(w))
+		w.SetContent(createNewGame(w))
 	})
 	//width := but1.Size().Width
 	//but1.Resize(fyne.NewSize(40, 40))
 	but2 := widget.NewButtonWithIcon("register new Game", theme.ContentAddIcon(), func() {
-		w.SetContent(RegisterGameFullScore(w))
+		w.SetContent(registerGameFullScore(w))
 	})
 	but3 := widget.NewButtonWithIcon("search for game", theme.SearchIcon(), func() {
-		w.SetContent(PiSearch(w))
+		w.SetContent(piSearch(w))
 	})
-	but4 := widget.NewButtonWithIcon("search for Team Data", theme.SearchIcon(), func() {
-		w.SetContent(SearchWith1Team(w))
+	but4 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
+		w.SetContent(registerTeams(w))
 	})
-	but5 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
-		w.SetContent(RegisterTeams(w))
-	})
-	grid := container.NewGridWithRows(5, but1, but2, but3, but4, but5)
+	grid := container.NewGridWithRows(5, but1, but2, but3, but4)
 
 	return grid
 }
 
 // A tab for registering teams to already created games.
-func RegisterTeams(w fyne.Window) fyne.CanvasObject {
+func registerTeams(w fyne.Window) fyne.CanvasObject {
 	radOptions := models.DirIterator(models.GetBase())
 	Select := widget.NewSelect(radOptions, func(s string) {
 	})
@@ -85,7 +82,7 @@ func RegisterTeams(w fyne.Window) fyne.CanvasObject {
 }
 
 // A tab to create a new game and register teams to compete in such a game
-func CreateNewGame(w fyne.Window) fyne.CanvasObject {
+func createNewGame(w fyne.Window) fyne.CanvasObject {
 	gameType := new(widget.Entry)
 	store := &gameType.Text
 

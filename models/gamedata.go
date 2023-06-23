@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/arewabolu/csvmanager"
 )
@@ -96,53 +95,6 @@ func SearchTeam2(team string, data csvmanager.Frame) (homeGoals []int, awayGoals
 	return
 }
 
-func SearcherV2(gameType string, team, status string) (float64, float64) {
-	rds, _ := csvmanager.ReadCsv(GetBase()+gameType+".csv", 0755, true, 400)
-	team = strings.ToUpper(team)
-	teamGoals := SearchTeam(team, rds)
-	teamGoalsFloat := FloatCon(teamGoals)
-	goalsAgainst := SearchTeam3(team, rds)
-	goalsAgainstFLoat := FloatCon(goalsAgainst)
-	multiStatus := StatusAllocator(rds, team)
-
-	var statusInt float64
-	if status == "home" { //, "away"
-		statusInt = 1
-	} else {
-		statusInt = 0
-	}
-
-	TD := &TeamData{
-		GoalFor:     teamGoalsFloat,
-		GoalAgainst: goalsAgainstFLoat,
-		Status:      FloatCon(multiStatus),
-	}
-	r, MAE := TrainAndTest(TD)
-	xG := AveragexGFCalc(statusInt, r, TD, 30)
-	if xG == 0 {
-		MAE = 0
-	}
-	return xG, MAE
-
-}
-
-// returns opponents goals for a single team
-// to replace GetGames especially when testing
-func SearchTeam3(team string, data csvmanager.Frame) (homeGoals []int) {
-	for _, game := range data.Rows() {
-		nwData := &Data{}
-		game.Interface(nwData)
-
-		switch {
-		case team == nwData.Home:
-			homeGoals = append(homeGoals, nwData.AwayScore)
-		case team == nwData.Away:
-			homeGoals = append(homeGoals, nwData.HomeScore)
-		}
-	}
-	return
-}
-
 func SearchTeam4(team1, team2 string, game string) (float64, float64) {
 	games := GetGames(&game, team1, team2)
 	var even, odd float64
@@ -203,37 +155,3 @@ func TeamGoals(filePath string, HT, AT string) (HTMatches, ATMatches []int) {
 	}
 	return
 }
-
-func Wins(team string, data csvmanager.Frame) (wins []int) {
-	for _, game := range data.Rows() {
-		nwData := &Data{}
-		game.Interface(nwData)
-
-		if team == nwData.Home && nwData.HomeScore > nwData.AwayScore {
-			wins = append(wins, nwData.AwayScore)
-		}
-		if team == nwData.Away && nwData.AwayScore > nwData.HomeScore {
-			wins = append(wins, nwData.HomeScore)
-		}
-	}
-	return
-}
-
-func Loss(team string, data csvmanager.Frame) (loss []int) {
-	for _, game := range data.Rows() {
-		nwData := &Data{}
-		game.Interface(nwData)
-
-		if team == nwData.Home && nwData.HomeScore < nwData.AwayScore {
-			loss = append(loss, nwData.AwayScore)
-		}
-		if team == nwData.Away && nwData.AwayScore < nwData.HomeScore {
-			loss = append(loss, nwData.HomeScore)
-		}
-	}
-	return
-}
-
-// Returns the average goals scored by both teams
-
-// returns the percentage of wins and the percentage draw for each team respectively

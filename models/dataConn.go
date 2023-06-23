@@ -91,6 +91,7 @@ func CreateTeamsFile(gameName string) error {
 	}
 	return nil
 }
+
 func CreateRatingFile(gameName string) error {
 	if gameName == "" {
 		return errors.New("please state the name of the file")
