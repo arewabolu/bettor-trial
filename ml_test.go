@@ -24,73 +24,6 @@ func (i *invests) betLoss() {
 	i.balance = i.balance - i.stake
 }
 
-func TestClassEV(t *testing.T) {
-	teams := []string{"ARS", "PSG", "BAY", "BAR", "RMA", "JUV", "LIV", "MCI"}
-	game := "fifa22Pen"
-	rds, err := csvmanager.ReadCsv(models.GetBase()+game+".csv", 0755, true)
-	if err != nil {
-		t.Error("failed to open game file", err)
-	}
-
-	for _, team := range teams {
-		inv := &invests{
-			balance: 500,
-			stake:   50.00,
-			odds:    1.35,
-		}
-
-		var even, odd float64
-		teamGoals := models.SearchTeam(team, rds)
-		teamGoalsAgainst := models.SearchTeam3(team, rds)
-		for i := 0; i < len(teamGoals); i++ { // len(teamGoals)
-			sum := teamGoals[i] + teamGoalsAgainst[i]
-			switch {
-			case sum == 0:
-				continue
-			case sum%2 == 0 && inv.balance >= 50.0:
-				even++
-				inv.betLoss()
-			case sum%2 != 0 && inv.balance >= 50.0:
-				odd++
-				inv.bet()
-			}
-		}
-		evenprob := (even / (even + odd))
-		oddProb := 1 - evenprob
-		EV := (oddProb * 58) - (evenprob * 50)
-		t.Error(team, ":", fmt.Sprintf("%.2f", EV), *inv)
-	}
-}
-
-func TestClassEV2(t *testing.T) {
-	teams := []string{"AVL", "ARS", "BHA", "BRE", "BUR", "CHE", "CRY", "EVE", "LEI", "LIV", "LU", "MCI", "MU", "NOR", "NU", "SOU", "TOT", "WAT", "WHU", "WOL"}
-	game := "fifa4x4Eng"
-	rds, _ := csvmanager.ReadCsv(models.GetBase()+game+".csv", 0755, true)
-	for _, team := range teams {
-		potentialPay := 30
-		var even, odd float64
-		teamGoals := models.SearchTeam(team, rds)
-		teamGoalsAgainst := models.SearchTeam3(team, rds)
-		for i := 0; i < 20; i++ {
-			sum := teamGoals[i] + teamGoalsAgainst[i]
-			switch {
-			case sum == 0:
-				continue
-			case sum%2 == 0:
-				even++
-				potentialPay = potentialPay + 24
-			default:
-				odd++
-				potentialPay = potentialPay - 30
-			}
-		}
-		evenprob := (even / (even + odd))
-		oddProb := 1 - evenprob
-		EV := (evenprob * 36) - (oddProb * 30)
-		t.Error(team, ":", EV, potentialPay)
-	}
-}
-
 func TestClassEV3(t *testing.T) {
 	teams := []string{"ARS", "PSG", "BAY", "BAR", "RMA", "JUV", "LIV", "MCI"}
 	game := "fifa22Pen"
@@ -208,34 +141,6 @@ func TestClassEV5(t *testing.T) {
 		}
 
 	}
-}
-
-func TestMeanVariance(t *testing.T) {
-	game := "fifa22Pen" // "fifa4x4Eng"
-	rds, err := csvmanager.ReadCsv(models.GetBase()+game+".csv", 0755, true)
-	if err != nil {
-		t.Error("failed to open game file", err)
-		t.FailNow()
-	}
-	sums := make([]float64, 0)
-	teamGoals := models.SearchTeam(models.Rma, rds)
-	teamGoalsAgainst := models.SearchTeam3(models.Ars, rds)
-	for i := range teamGoals {
-		sum := teamGoals[i] + teamGoalsAgainst[i]
-		sums = append(sums, float64(sum))
-	}
-	hmMean, hmVar := stat.MeanStdDev(sums, nil)
-	/*
-		file, _ := os.OpenFile("arsGOals.csv", os.O_CREATE|os.O_RDWR, 0755)
-		wr := csvmanager.WriteFrame{
-			Headers: []string{"totalGoals"},
-			Columns: [][]string{models.FloattoString(sums)},
-			File:    file,
-		}
-		wr.WriteCSV()*/
-	//awayMean, awVar := stat.MeanStdDev(models.FloatCon(aw), nil)
-	t.Error(hmMean, hmVar)
-	//t.Error(awayMean, awVar)
 }
 
 func TestMeanVariance2(t *testing.T) {
