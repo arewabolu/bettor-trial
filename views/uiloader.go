@@ -3,15 +3,11 @@ package views
 import (
 	"bettor/controller"
 	"bettor/models"
-	"fmt"
-	"image/color"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -44,7 +40,10 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 	but4 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
 		w.SetContent(registerTeams(w))
 	})
-	grid := container.NewGridWithRows(5, but1, but2, but3, but4)
+	but5 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
+		w.SetContent(prependGames(w))
+	})
+	grid := container.NewGridWithRows(5, but1, but2, but3, but4, but5)
 
 	return grid
 }
@@ -111,36 +110,4 @@ func createNewGame(w fyne.Window) fyne.CanvasObject {
 
 	vBox := container.NewVBox(backButn, gameType, button)
 	return vBox
-}
-
-func makeImage(w fyne.Window) fyne.CanvasObject {
-	uri, err := storage.ParseURI("file://" + models.GetBaseImage())
-	if err != nil {
-		dialog.ShowError(fmt.Errorf("could not parse \""+uri.String()+"\""), w)
-	}
-
-	val, err := storage.CanRead(uri)
-
-	if err != nil {
-		dialog.ShowError(fmt.Errorf("No folder for \""+uri.Scheme()+"\""), w)
-	}
-	if !val {
-		dialog.ShowError(fmt.Errorf("Unable to open file \""+uri.Name()+"\"", err), w)
-	}
-
-	read, err := storage.Reader(uri)
-	if err != nil {
-		dialog.ShowError(fmt.Errorf("Unable to open file \""+uri.Name()+"\"", err), w)
-	}
-	defer read.Close()
-
-	res, err := storage.LoadResourceFromURI(read.URI())
-	if err != nil {
-		dialog.ShowError(fmt.Errorf("error loading image %s", uri.Name()), w)
-		return canvas.NewRectangle(color.Black)
-	}
-
-	img := canvas.NewImageFromResource(res)
-	img.FillMode = canvas.ImageFillContain
-	return img
 }
