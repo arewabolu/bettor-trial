@@ -19,6 +19,8 @@ func piSearch(w fyne.Window) fyne.CanvasObject {
 	HTLabel := widget.NewLabel("Home Team:")
 	ATLabel := widget.NewLabel("Away Team:")
 
+	image := makeImage(w)
+
 	submit := new(widget.Button)
 	submit.Text = "Search"
 
@@ -56,7 +58,7 @@ func piSearch(w fyne.Window) fyne.CanvasObject {
 		})
 
 		teamsInfo := container.NewVBox(backButn, team1, team2, RD)
-		w.SetContent(container.NewBorder(teamsInfo, nil, nil, nil, makeImage(w)))
+		w.SetContent(container.NewBorder(teamsInfo, nil, nil, nil, image))
 
 	}
 

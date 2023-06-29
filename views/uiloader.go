@@ -31,16 +31,16 @@ func uiLoader(w fyne.Window) fyne.CanvasObject {
 	})
 	//width := but1.Size().Width
 	//but1.Resize(fyne.NewSize(40, 40))
-	but2 := widget.NewButtonWithIcon("register new Game", theme.ContentAddIcon(), func() {
+	but2 := widget.NewButtonWithIcon("Add new Game", theme.ContentAddIcon(), func() {
 		w.SetContent(registerGameFullScore(w))
 	})
-	but3 := widget.NewButtonWithIcon("search for game", theme.SearchIcon(), func() {
+	but3 := widget.NewButtonWithIcon("Search", theme.SearchIcon(), func() {
 		w.SetContent(piSearch(w))
 	})
 	but4 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
 		w.SetContent(registerTeams(w))
 	})
-	but5 := widget.NewButtonWithIcon("Register team for game", theme.FileTextIcon(), func() {
+	but5 := widget.NewButtonWithIcon("Prepend old game(s)", theme.FileTextIcon(), func() {
 		w.SetContent(prependGames(w))
 	})
 	grid := container.NewGridWithRows(5, but1, but2, but3, but4, but5)
