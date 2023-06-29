@@ -2,10 +2,15 @@ package views
 
 import (
 	"bettor/controller"
+	"bettor/models"
 	"errors"
+	"fmt"
+	"image/color"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/widget"
 )
@@ -59,4 +64,36 @@ func TabKey(w fyne.Window, butn *widget.Button) *fyne.KeyEvent {
 		test.Tap(butn)
 	}
 	return key
+}
+
+func makeImage(w fyne.Window) fyne.CanvasObject {
+	uri, err := storage.ParseURI("file://" + models.GetBaseImage())
+	if err != nil {
+		dialog.ShowError(fmt.Errorf("could not parse \""+uri.String()+"\""), w)
+	}
+
+	val, err := storage.CanRead(uri)
+
+	if err != nil {
+		dialog.ShowError(fmt.Errorf("No folder for \""+uri.Scheme()+"\""), w)
+	}
+	if !val {
+		dialog.ShowError(fmt.Errorf("Unable to open file \""+uri.Name()+"\"", err), w)
+	}
+
+	read, err := storage.Reader(uri)
+	if err != nil {
+		dialog.ShowError(fmt.Errorf("Unable to open file \""+uri.Name()+"\"", err), w)
+	}
+	defer read.Close()
+
+	res, err := storage.LoadResourceFromURI(read.URI())
+	if err != nil {
+		dialog.ShowError(fmt.Errorf("error loading image %s", uri.Name()), w)
+		return canvas.NewRectangle(color.Black)
+	}
+
+	img := canvas.NewImageFromResource(res)
+	img.FillMode = canvas.ImageFillContain
+	return img
 }
