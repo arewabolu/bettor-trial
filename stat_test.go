@@ -2,7 +2,6 @@ package main
 
 import (
 	"bettor/models"
-	"math"
 	"strconv"
 	"testing"
 
@@ -50,8 +49,8 @@ func TestSearchWithPi(t *testing.T) {
 	}
 	var count, win, loss int
 	for _, test := range games {
-		hT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Home, "home")
-		aT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Away, "away")
+		hT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Home)
+		aT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Away)
 		ratingH := (hT.HomeRating + hT.AwayRating) / 2
 		ratingA := (aT.HomeRating + aT.AwayRating) / 2
 		//	if ratingH < 0 {
@@ -119,7 +118,7 @@ func TestWriteratings(t *testing.T) {
 			t.Error(err)
 			t.FailNow()
 		}
-		err = pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa22Eng.csv", HomeTeam.Name, AwayTeam.Name, homeGoal, awayGoal)
+		_, _, err = pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa22Eng.csv", HomeTeam.Name, AwayTeam.Name, homeGoal, awayGoal)
 		if err != nil {
 			t.Error(err)
 			t.Fail()
@@ -129,7 +128,7 @@ func TestWriteratings(t *testing.T) {
 }
 
 func TestWriteToPi(t *testing.T) {
-	err := pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa4x4Eng.csv", "NU", "WAT", 5, 1)
+	_, _, err := pi.UpdateTeamRatings(models.GetBase()+"ratingsfifa4x4Eng.csv", "NU", "WAT", 5, 1)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -139,8 +138,8 @@ func TestWriteToPi(t *testing.T) {
 func TestSingles(t *testing.T) {
 	home := "ARS"
 	awat := "BUR"
-	hT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), home, "home")
-	aT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), awat, "away")
+	hT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), home)
+	aT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), awat)
 	homexG := pi.ExpectedGoalIndividual(hT.HomeRating)
 	awayxG := pi.ExpectedGoalIndividual(aT.AwayRating)
 	ratingH := (hT.HomeRating + hT.AwayRating) / 2
@@ -187,20 +186,27 @@ func TestSearchWithPixG(t *testing.T) {
 	}
 	var win, loss int
 	for _, test := range games {
-		hT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Home, "home")
-		aT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Away, "away")
+		hT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Home)
+		aT, _ := pi.Search(models.GetBaseGameType("ratings", "fifa22Eng"), test.Away)
 		homexG := pi.ExpectedGoalIndividual(hT.HomeRating)
 		awayxG := pi.ExpectedGoalIndividual(aT.AwayRating)
 		xG := pi.ExpectedGoalDifference(homexG, awayxG)
 		GD := test.HomeScore - test.AwayScore
-		t.Error(math.Ceil(xG))
 		switch {
-		case math.Ceil(xG) >= float64(GD):
+		case xG > 0 && float64(GD) >= xG:
+			win++
+			inv.bet()
+			t.Error("after win:", inv.balance)
+		case xG < 0 && float64(GD) < xG:
 			win++
 			inv.bet()
 			t.Error("after win:", inv.balance)
 
-		case math.Ceil(xG) < float64(GD):
+		case xG > 0 && float64(GD) < xG:
+			loss++
+			inv.betLoss()
+			t.Error("after loss:", inv.balance)
+		case xG < 0 && float64(GD) > xG:
 			loss++
 			inv.betLoss()
 			t.Error("after loss:", inv.balance)

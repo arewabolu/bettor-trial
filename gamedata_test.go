@@ -5,6 +5,8 @@ import (
 	"bettor/models"
 	"strconv"
 	"testing"
+
+	"github.com/arewabolu/csvmanager"
 )
 
 func TestCheckWriter(t *testing.T) {
@@ -33,4 +35,16 @@ func TestCheckWriter(t *testing.T) {
 		//	err := WriteMatchData(homeTeam, awayTeam, homeScore, awayScore)
 
 	}
+}
+
+func TestPrepend(t *testing.T) {
+	csvmanager.PrependRow(models.GetBase()+"fifa4x4Eng"+".csv", 0755, true, []string{"CHE", "LU", "6", "6"})
+}
+
+func TestGetGamesV2(t *testing.T) {
+	games, _ := models.GetGamesV2("fifa22Eng", "LEI")
+	team := models.GenerateInstantPi(games, "LEI")
+	t.Error(team)
+
+	t.Error(team.ProvisionalRating("home"))
 }

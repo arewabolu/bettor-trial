@@ -33,7 +33,7 @@ func TestClassEV3(t *testing.T) {
 			if team == team2 {
 				continue
 			}
-			games := models.GetGames(&game, team, team2)
+			games := models.GetGames(game, team, team2)
 			//if len(games) < 30 {
 			//	continue
 			//}
@@ -73,7 +73,7 @@ func TestClassEV4(t *testing.T) {
 	team1 := models.Rma
 	team2 := models.Liv
 	game := "fifa22Pen"
-	games := models.GetGames(&game, team1, team2)
+	games := models.GetGames(game, team1, team2)
 
 	inv := &invests{
 		balance: 500,
@@ -116,7 +116,7 @@ func TestClassEV5(t *testing.T) {
 			if team == team2 {
 				continue
 			}
-			games := models.GetGames(&game, team, team2)
+			games := models.GetGames(game, team, team2)
 			//if len(games) < 30 {
 			//	continue
 			//}
@@ -194,7 +194,7 @@ func TestSimulator(t *testing.T) {
 
 			switch {
 			case team == models.Bre && team2 == models.Nu:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -209,7 +209,7 @@ func TestSimulator(t *testing.T) {
 					}
 				}
 			case team == models.Eve && team2 == models.Lei:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -224,7 +224,7 @@ func TestSimulator(t *testing.T) {
 					}
 				}
 			case team == models.Lu && team2 == models.Mci:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -239,7 +239,7 @@ func TestSimulator(t *testing.T) {
 					}
 				}
 			case team == models.Nu && team2 == models.Bre:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -254,7 +254,7 @@ func TestSimulator(t *testing.T) {
 					}
 				}
 			case team == models.Lei && team2 == models.Eve:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -269,7 +269,7 @@ func TestSimulator(t *testing.T) {
 					}
 				}
 			case team == models.Mci && team2 == models.Lu:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -307,7 +307,7 @@ func TestSimulatorPen(t *testing.T) {
 			}
 			switch {
 			case team == models.Bay && team2 == models.Liv:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -321,7 +321,7 @@ func TestSimulatorPen(t *testing.T) {
 					}
 				}
 			case team == models.Mci && team2 == models.Rma:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -335,7 +335,7 @@ func TestSimulatorPen(t *testing.T) {
 					}
 				}
 			case team == models.Bay && team2 == models.Ars:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -348,7 +348,7 @@ func TestSimulatorPen(t *testing.T) {
 					}
 				}
 			case team == models.Psg && team2 == models.Liv:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -362,7 +362,7 @@ func TestSimulatorPen(t *testing.T) {
 					}
 				}
 			case team == models.Liv && team2 == models.Bay:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -376,7 +376,7 @@ func TestSimulatorPen(t *testing.T) {
 					}
 				}
 			case team == models.Rma && team2 == models.Mci:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -390,7 +390,7 @@ func TestSimulatorPen(t *testing.T) {
 					}
 				}
 			case team == models.Ars && team2 == models.Bay:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
@@ -404,7 +404,7 @@ func TestSimulatorPen(t *testing.T) {
 					}
 				}
 			case team == models.Liv && team2 == models.Psg:
-				games := models.GetGames(&game, team, team2)
+				games := models.GetGames(game, team, team2)
 				for _, game := range games {
 					sum := game.HomeScore + game.AwayScore
 					switch {
