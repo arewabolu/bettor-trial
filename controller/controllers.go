@@ -21,6 +21,18 @@ func CheckWriter(flagValue string, flagArgs []string) error {
 	return err
 }
 
+func PrependMatchData(flagValue string, data []string) error {
+	homeTeam := strings.ToUpper(strings.TrimSpace(data[0]))
+	awayTeam := strings.ToUpper(strings.TrimSpace(data[1]))
+	homeScore := strings.TrimSpace(data[2])
+	awayScore := strings.TrimSpace(data[3])
+	err := csvmanager.PrependRow(models.GetBase()+flagValue+".csv", 0755, true, []string{homeTeam, awayTeam, homeScore, awayScore})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func CheckReader(gameType string, gameValues []string) (float64, float64, error) {
 	homeTeam := strings.ToUpper(gameValues[0])
 	awayTeam := strings.ToUpper(gameValues[1])
@@ -34,7 +46,7 @@ func CheckReader(gameType string, gameValues []string) (float64, float64, error)
 }
 
 func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, err error) {
-	games := models.GetGames(&gameType, homeTeam, awayTeam)
+	games := models.GetGames(gameType, homeTeam, awayTeam)
 	err = models.CheckifReg(gameType, homeTeam, awayTeam)
 	if err != nil {
 		return 0, 0, 0, err
@@ -45,15 +57,34 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, 
 }
 
 func ReadPi(gameType, home, away string) (float64, float64, error) {
-	hT, err := pi.Search(models.GetBaseGameType("ratings", gameType), home, "home")
+	homeTeamGames, err := models.GetGamesV2(gameType, home)
 	if err != nil {
 		return 0, 0, err
 	}
-	aT, err := pi.Search(models.GetBaseGameType("ratings", gameType), away, "away")
-	if err != nil {
-		return 0, 0, err
-	}
+	homeTeam := models.GenerateInstantPi(homeTeamGames, home)
 
+	awayTeamGames, err := models.GetGamesV2(gameType, home)
+	if err != nil {
+		return 0, 0, err
+	}
+	awayTeam := models.GenerateInstantPi(awayTeamGames, away)
+
+	homeTeam = homeTeam.ProvisionalRating("home")
+	awayTeam = awayTeam.ProvisionalRating("away")
+	return homeTeam.HomeRating, awayTeam.AwayRating, nil
+}
+
+func ReadPiV2(gameType, home, away string) (float64, float64, error) {
+	hT, err := pi.Search(models.GetBaseGameType("ratings", gameType), home)
+	if err != nil {
+		return 0, 0, err
+	}
+	aT, err := pi.Search(models.GetBaseGameType("ratings", gameType), away)
+	if err != nil {
+		return 0, 0, err
+	}
+	hT = hT.ProvisionalRating("home")
+	aT = aT.ProvisionalRating("away")
 	return hT.HomeRating, aT.AwayRating, nil
 }
 
@@ -81,10 +112,12 @@ func GenRating(gameType string) error {
 
 // WritePi is a wrapper around UpdateTeamRatings
 func WritePi(gameType, homeTeam, awayTeam string, homeScore, awayScore int) error {
-	err := pi.UpdateTeamRatings(models.GetBaseGameType("ratings", gameType), homeTeam, awayTeam, homeScore, awayScore)
+	hT, aT, err := pi.UpdateTeamRatings(models.GetBaseGameType("ratings", gameType), homeTeam, awayTeam, homeScore, awayScore)
 	if err != nil {
 		return err
 	}
+	hT.WriteRatings(models.GetBaseGameType("ratings", gameType))
+	aT.WriteRatings(models.GetBaseGameType("ratings", gameType))
 	return nil
 }
 
@@ -123,34 +156,5 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	defer wr.Flush()
 
 	wr.Write([]string{data2Reg[0], data2Reg[1], data2Reg[2], data2Reg[3]})
-	return nil
-}
-
-// deprecated: no longer supported. Use WriteMatchData instead.
-func WriteMatchDataHalfs(data2Reg []string) (err error) {
-	homeTeam := strings.ToUpper(strings.TrimSpace(data2Reg[0]))
-	home1stHalfScore := strings.TrimSpace(data2Reg[1])
-	home2ndHalfScore := strings.TrimSpace(data2Reg[2])
-
-	awayTeam := strings.ToUpper(strings.TrimSpace(data2Reg[3]))
-	away1stHalfScore := strings.TrimSpace(data2Reg[4])
-	away2ndHalfScore := strings.TrimSpace(data2Reg[5])
-	if homeTeam == "" || home1stHalfScore == "" || home2ndHalfScore == "" || awayTeam == "" || away1stHalfScore == "" || away2ndHalfScore == "" {
-		return errors.New("please fill all entries")
-	}
-	//should modify CheckRegisteredTeam??? should return error to verify if team exists
-	//err = models.CheckRegisteredTeams(homeTeam, awayTeam)
-	//models.CheckErr(err)
-
-	file, err := os.OpenFile(models.GetBase()+"fifa4x4halfsEng.csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	wr := csv.NewWriter(file)
-	defer wr.Flush()
-
-	wr.Write([]string{homeTeam, home1stHalfScore, home2ndHalfScore, awayTeam, away1stHalfScore, away2ndHalfScore})
 	return nil
 }
