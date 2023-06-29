@@ -197,14 +197,6 @@ func DirIterator(basedir string) []string {
 	return nameSlice
 }
 
-func FloatCon(slice []int) []float64 {
-	floatSli := make([]float64, 0)
-	for _, input := range slice {
-		floatSli = append(floatSli, float64(input))
-	}
-	return floatSli
-}
-
 func FloattoString(x []float64) []string {
 	strFloatArr := make([]string, 0, len(x))
 	for i := range x {
