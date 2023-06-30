@@ -15,13 +15,13 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func SaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *widget.Button {
+func writeSaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *widget.Button {
 	return widget.NewButton("Save", func() {
 		HT := ent[0].Text
-		HT1stHalf := ent[1].Text
-		HT2ndHalf := ent[2].Text
-		AT := ent[3].Text
-		values := []string{HT, HT1stHalf, HT2ndHalf, AT}
+		AT := ent[1].Text
+		HTGoals := ent[2].Text
+		ATGoals := ent[3].Text
+		values := []string{HT, AT, HTGoals, ATGoals}
 
 		if Select.Selected == "" {
 			dlog := dialog.NewError(errors.New("please select the game type"), w)
@@ -33,8 +33,42 @@ func SaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *wid
 			})
 			return
 		}
-
 		err := controller.CheckWriter(Select.Selected, values)
+
+		if err != nil {
+			dlog := dialog.NewError(err, w)
+			dlog.Show()
+			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+				if ke.Name == fyne.KeyReturn {
+					dlog.Hide()
+				}
+			})
+			return
+		}
+		entryDel(ent...)
+	})
+}
+
+func prependSaveButton(Select *widget.Select, w fyne.Window, ent ...*widget.Entry) *widget.Button {
+	return widget.NewButton("Save", func() {
+		HT := ent[0].Text
+		AT := ent[1].Text
+		HTGoals := ent[2].Text
+		ATGoals := ent[3].Text
+		values := []string{HT, AT, HTGoals, ATGoals}
+
+		if Select.Selected == "" {
+			dlog := dialog.NewError(errors.New("please select the game type"), w)
+			dlog.Show()
+			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
+				if ke.Name == fyne.KeyReturn {
+					dlog.Hide()
+				}
+			})
+			return
+		}
+		err := controller.PrependMatchData(Select.Selected, values)
+
 		if err != nil {
 			dlog := dialog.NewError(err, w)
 			dlog.Show()
