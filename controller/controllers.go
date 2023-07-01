@@ -22,27 +22,28 @@ func CheckWriter(flagValue string, flagArgs []string) error {
 }
 
 func PrependMatchData(flagValue string, data []string) error {
+	if strings.Contains(flagValue, "pen") && data[2] == data[3] {
+		return errors.New("there are no draws in penalties")
+	}
+	if data[0] == "" || data[1] == "" || data[2] == "" || data[3] == "" {
+		return errors.New("please fill all entries")
+	}
+
 	homeTeam := strings.ToUpper(strings.TrimSpace(data[0]))
 	awayTeam := strings.ToUpper(strings.TrimSpace(data[1]))
 	homeScore := strings.TrimSpace(data[2])
 	awayScore := strings.TrimSpace(data[3])
-	err := csvmanager.PrependRow(models.GetBase()+flagValue+".csv", 0755, true, []string{homeTeam, awayTeam, homeScore, awayScore})
+
+	err := models.CheckifReg(flagValue, homeTeam, awayTeam)
+	if err != nil {
+		return err
+	}
+
+	err = csvmanager.PrependRow(models.GetBase()+flagValue+".csv", 0755, true, []string{homeTeam, awayTeam, homeScore, awayScore})
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func CheckReader(gameType string, gameValues []string) (float64, float64, error) {
-	homeTeam := strings.ToUpper(gameValues[0])
-	awayTeam := strings.ToUpper(gameValues[1])
-	err := models.CheckifReg(gameType, homeTeam, awayTeam)
-	if err != nil {
-		return 0, 0, err
-	}
-	//GP, even, odd, err = ReadMatch(gameType, homeTeam, awayTeam)
-	ratingH, ratingA, err := ReadPi(gameType, homeTeam, awayTeam)
-	return ratingH, ratingA, err
 }
 
 func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, err error) {
@@ -56,22 +57,41 @@ func ReadMatch(gameType, homeTeam, awayTeam string) (GP int, even, odd float64, 
 	return
 }
 
-func ReadPi(gameType, home, away string) (float64, float64, error) {
-	homeTeamGames, err := models.GetGamesV2(gameType, home)
+func ReadPi(gameType string, teams []string) (float64, float64, error) {
+	homeTeam := strings.ToUpper(strings.TrimSpace(teams[0]))
+	awayTeam := strings.ToUpper(strings.TrimSpace(teams[1]))
+	err := models.CheckifReg(gameType, homeTeam, awayTeam)
 	if err != nil {
 		return 0, 0, err
 	}
-	homeTeam := models.GenerateInstantPi(homeTeamGames, home)
-
-	awayTeamGames, err := models.GetGamesV2(gameType, home)
+	homeTeamGames, err := models.GetGamesV2(gameType, homeTeam)
 	if err != nil {
 		return 0, 0, err
 	}
-	awayTeam := models.GenerateInstantPi(awayTeamGames, away)
+	homeTeamHomeRating := models.GenerateInstantPi(homeTeamGames, homeTeam).ProvisionalRating("home").HomeRating
 
-	homeTeam = homeTeam.ProvisionalRating("home")
-	awayTeam = awayTeam.ProvisionalRating("away")
-	return homeTeam.HomeRating, awayTeam.AwayRating, nil
+	awayTeamGames, err := models.GetGamesV2(gameType, awayTeam)
+	if err != nil {
+		return 0, 0, err
+	}
+	awayTeamAwayRating := models.GenerateInstantPi(awayTeamGames, awayTeam).ProvisionalRating("away").AwayRating
+
+	return homeTeamHomeRating, awayTeamAwayRating, nil
+}
+
+// Generate the Head to Head Pi Ratings for the 2 teams using their
+// previous match results
+func ReadH2HPi(gameType string, teams []string) (float64, float64, error) {
+	home := strings.ToUpper(strings.TrimSpace(teams[0]))
+	away := strings.ToUpper(strings.TrimSpace(teams[1]))
+	games, err := models.GetGamesV3(gameType, home, away)
+	if err != nil {
+		return 0, 0, err
+	}
+	homeTeam := models.GenerateInstantPi(games, home).ProvisionalRating("home").HomeRating
+	awayTeam := models.GenerateInstantPi(games, away).ProvisionalRating("away").AwayRating
+
+	return homeTeam, awayTeam, nil
 }
 
 func ReadPiV2(gameType, home, away string) (float64, float64, error) {
@@ -133,18 +153,6 @@ func WriteMatchData(gameType string, data2Reg []string) (err error) {
 	err = models.CheckifReg(gameType, data2Reg[0], data2Reg[1])
 	if err != nil {
 		return err
-	}
-	homeScoreInt, err := strconv.Atoi(data2Reg[2])
-	if err != nil {
-		return errors.New("please fill correct hometeam score")
-	}
-	awayScoreInt, err := strconv.Atoi(data2Reg[3])
-	if err != nil {
-		return errors.New("please fill correct awayteam score")
-	}
-	err = WritePi(gameType, data2Reg[0], data2Reg[1], homeScoreInt, awayScoreInt)
-	if err != nil {
-		return errors.New("cannot update Pi")
 	}
 	file, err := os.OpenFile(models.GetBase()+gameType+".csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
