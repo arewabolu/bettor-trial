@@ -31,11 +31,13 @@ func piSearch(w fyne.Window) fyne.CanvasObject {
 	backButn1 := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 		w.SetContent(uiLoader(w))
 	})
+
 	HTHBox := container.NewBorder(nil, nil, HTLabel, nil, HTEnt)
 	ATHBox := container.NewBorder(nil, nil, ATLabel, nil, ATEnt)
 	vBox2 := container.NewVBox(HTHBox, ATHBox)
+	controlsCont := container.NewBorder(nil, nil, backButn1, nil, Select)
 
-	Box := container.NewBorder(container.NewVBox(backButn1, Select), submit, nil, nil, vBox2)
+	Box := container.NewBorder(controlsCont, submit, nil, nil, vBox2)
 
 	submit.OnTapped = func() {
 		values := []string{HTEnt.Text, ATEnt.Text}
@@ -43,23 +45,33 @@ func piSearch(w fyne.Window) fyne.CanvasObject {
 			dialog.ShowError(errors.New("please select the game type"), w)
 			return
 		}
-		//GP, percentageWinorDraw, odds,
-		ratingH, ratingA, err := controller.CheckReader(Select.Selected, values)
+
+		ratingH, ratingA, err := controller.ReadPi(Select.Selected, values)
 		if err != nil {
 			dialog.ShowError(err, w)
 			return
 		}
-		team1 := widget.NewLabel(fmt.Sprintf("%s:	%.4f", values[0], ratingH))
-		team2 := widget.NewLabel(fmt.Sprintf("%s:	%.4f", values[1], ratingA))
-		RD := widget.NewLabel(fmt.Sprintf("%s:	%.4f", "rating difference", ratingH-ratingA))
-		backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
+		H2HratingH, H2HratingA, err := controller.ReadH2HPi(Select.Selected, values)
+		if err != nil {
+			dialog.ShowError(err, w)
+			return
+		}
+
+		team1 := widget.NewLabel(fmt.Sprintf("%s: %.4f | Head-to-Head: %.4f", values[0], ratingH, H2HratingH))
+		team2 := widget.NewLabel(fmt.Sprintf("%s: %.4f | Head-to-Head: %.4f ", values[1], ratingA, H2HratingA))
+		RD := widget.NewLabel(fmt.Sprintf("RD: %.4f | H2H Difference: %.4f ", ratingH-ratingA, H2HratingH-H2HratingA))
+		backButn := widget.NewButtonWithIcon("Search Again", theme.NavigateBackIcon(), func() {
 			Box.RemoveAll()
 			w.SetContent(piSearch(w))
 		})
-
-		teamsInfo := container.NewVBox(backButn, team1, team2, RD)
-		w.SetContent(container.NewBorder(teamsInfo, nil, nil, nil, image))
-
+		backButn.IconPlacement = widget.ButtonIconLeadingText
+		exit := widget.NewButtonWithIcon("Exit search", theme.CancelIcon(), func() {
+			Box.RemoveAll()
+			w.SetContent(uiLoader(w))
+		})
+		exit.IconPlacement = widget.ButtonIconLeadingText
+		teamsInfo := container.NewBorder(nil, container.NewVBox(team1, team2, RD), backButn, exit)
+		w.SetContent(container.NewBorder(teamsInfo, nil, nil, nil, container.NewPadded(image)))
 	}
 
 	return Box
