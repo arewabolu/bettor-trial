@@ -1,14 +1,10 @@
 package views
 
 import (
-	"bettor/controller"
 	"bettor/models"
-	"errors"
-	"fmt"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -32,43 +28,14 @@ func registerGameFullScore(w fyne.Window) fyne.CanvasObject {
 	HTSHBox := container.NewBorder(nil, nil, HTSLabel, nil, HTSEnt)
 	ATSHBox := container.NewBorder(nil, nil, ATSLabel, nil, ATSEnt)
 
-	submit := writeSaveButton(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
+	submit := widget.NewButton("Submit", func() {
+		submitData(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
+	})
 	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 		w.SetContent(uiLoader(w))
 	})
-
-	fullCanvas := container.NewVBox(backButn, Select, HTHBox, HTSHBox, ATHBox, ATSHBox, submit)
-	ent := []*widget.Entry{&HTEnt.Entry, &ATEnt.Entry, &ATSEnt.Entry, &HTSEnt.Entry}
-	saveFunc := func() {
-		values := []string{HTEnt.Text, ATEnt.Text, HTSEnt.Text, ATSEnt.Text}
-
-		if Select.Selected == "" {
-			dlog := dialog.NewError(errors.New("please select the game type"), w)
-			dlog.Show()
-			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-				if ke.Name == fyne.KeyReturn {
-					defer w.Canvas().Focus(HTEnt)
-					dlog.Hide()
-				}
-			})
-			return
-		}
-
-		err := controller.CheckWriter(Select.Selected, values)
-		if err != nil {
-			dlog := dialog.NewError(err, w)
-			dlog.Show()
-			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-				if ke.Name == fyne.KeyReturn {
-					defer w.Canvas().Focus(HTEnt)
-					dlog.Hide()
-				}
-			})
-		}
-
-		entryDel(ent...)
-		fullCanvas.Refresh()
-	}
+	controlsCont := container.NewBorder(nil, nil, backButn, nil, Select)
+	fullCanvas := container.NewVBox(controlsCont, HTHBox, HTSHBox, ATHBox, ATSHBox, submit)
 
 	HTEnt.button = submit
 	ATEnt.button = submit
@@ -87,7 +54,7 @@ func registerGameFullScore(w fyne.Window) fyne.CanvasObject {
 			w.Canvas().Focus(ATSEnt)
 		case fyne.KeyReturn:
 			w.Canvas().Focus(submit)
-			saveFunc()
+			submitData(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
 		}
 
 	})
@@ -113,43 +80,15 @@ func prependGames(w fyne.Window) fyne.CanvasObject {
 	HTSHBox := container.NewBorder(nil, nil, HTSLabel, nil, HTSEnt)
 	ATSHBox := container.NewBorder(nil, nil, ATSLabel, nil, ATSEnt)
 
-	submit := prependSaveButton(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
+	submit := widget.NewButton("Save", func() {
+		prependSave(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
+	})
 	backButn := widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {
 		w.SetContent(uiLoader(w))
 	})
 
-	fullCanvas := container.NewVBox(backButn, Select, HTHBox, HTSHBox, ATHBox, ATSHBox, submit)
-	ent := []*widget.Entry{&HTEnt.Entry, &ATEnt.Entry, &ATSEnt.Entry, &HTSEnt.Entry}
-	saveFunc := func() {
-		values := []string{HTEnt.Text, ATEnt.Text, HTSEnt.Text, ATSEnt.Text}
-
-		if Select.Selected == "" {
-			dlog := dialog.NewError(errors.New("please select the game type"), w)
-			dlog.Show()
-			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-				if ke.Name == fyne.KeyReturn {
-					defer w.Canvas().Focus(HTEnt)
-					dlog.Hide()
-				}
-			})
-			return
-		}
-		fmt.Println()
-		err := controller.PrependMatchData(Select.Selected, values)
-		if err != nil {
-			dlog := dialog.NewError(err, w)
-			dlog.Show()
-			w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-				if ke.Name == fyne.KeyReturn {
-					defer w.Canvas().Focus(HTEnt)
-					dlog.Hide()
-				}
-			})
-		}
-
-		entryDel(ent...)
-		fullCanvas.Refresh()
-	}
+	controlsCont := container.NewBorder(nil, nil, backButn, nil, Select)
+	fullCanvas := container.NewVBox(controlsCont, HTHBox, HTSHBox, ATHBox, ATSHBox, submit)
 
 	HTEnt.button = submit
 	ATEnt.button = submit
@@ -168,9 +107,8 @@ func prependGames(w fyne.Window) fyne.CanvasObject {
 			w.Canvas().Focus(ATSEnt)
 		case fyne.KeyReturn:
 			w.Canvas().Focus(submit)
-			saveFunc()
+			prependSave(Select, w, &HTEnt.Entry, &ATEnt.Entry, &HTSEnt.Entry, &ATSEnt.Entry)
 		}
-
 	})
 	return fullCanvas
 }
