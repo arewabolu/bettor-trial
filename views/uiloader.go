@@ -15,14 +15,12 @@ import (
 // also an idea is to create a bayesian model that generates random numbers between 1 and 5
 // Can use the os.StartProcess function to start a new process check os/exec
 func AppStart() {
-	app := &appController{
-		application: app.NewWithID("com.example.myid"),
-	}
-	app.appwindow = app.application.NewWindow("Bettor")
+	app := app.NewWithID("com.github.arewabolu.bettor")
+	window := app.NewWindow("Bettor")
 
 	//app.appwindow.Resize(fyne.NewSize(550, 500))
-	app.appwindow.SetContent(uiLoader(app.appwindow))
-	app.appwindow.ShowAndRun()
+	window.SetContent(uiLoader(window))
+	window.ShowAndRun()
 }
 
 func uiLoader(w fyne.Window) fyne.CanvasObject {
