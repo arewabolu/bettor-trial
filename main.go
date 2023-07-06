@@ -69,7 +69,7 @@ func main() {
 		}
 
 	case slices.Contains(flagValues, search):
-		homeRating, AwayRating, err := controller.CheckReader(search, args)
+		homeRating, AwayRating, err := controller.ReadPi(search, args)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
