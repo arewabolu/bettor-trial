@@ -79,6 +79,10 @@ func ReadPi(gameType string, teams []string) (float64, float64, error) {
 	return homeTeamHomeRating, awayTeamAwayRating, nil
 }
 
+func ReadExpectedGoals(homeTeamHomeRating float64, awayTeamAwayRating float64) (float64, float64) {
+	return pi.ExpectedGoalIndividual(homeTeamHomeRating), pi.ExpectedGoalIndividual(awayTeamAwayRating)
+}
+
 // Generate the Head to Head Pi Ratings for the 2 teams using their
 // previous match results
 func ReadH2HPi(gameType string, teams []string) (float64, float64, error) {
@@ -94,6 +98,7 @@ func ReadH2HPi(gameType string, teams []string) (float64, float64, error) {
 	return homeTeam, awayTeam, nil
 }
 
+// ReadPiV2 IS UNUSED
 func ReadPiV2(gameType, home, away string) (float64, float64, error) {
 	hT, err := pi.Search(models.GetBaseGameType("ratings", gameType), home)
 	if err != nil {
