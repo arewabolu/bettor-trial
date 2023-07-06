@@ -3,20 +3,20 @@ module bettor
 go 1.20
 
 require (
-	fyne.io/fyne/v2 v2.3.4
-	github.com/arewabolu/csvmanager v1.4.14
-	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
+	fyne.io/fyne/v2 v2.3.5
+	github.com/arewabolu/csvmanager v1.5.1
+	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
 	gonum.org/v1/gonum v0.13.0
 
 )
 
 require (
-	github.com/arewabolu/pi-rating v0.0.14
-	github.com/go-text/typesetting v0.0.0-20230520134535-86265021ae8e // indirect
+	github.com/arewabolu/pi-rating v0.0.15
+	github.com/go-text/typesetting v0.0.0-20230618175549-b5753034b590 // indirect
 )
 
 require (
-	fyne.io/systray v1.10.1-0.20230403195833-7dc3c09283d6 // indirect
+	fyne.io/systray v1.10.1-0.20230602210930-b6a2d6ca2a7b // indirect
 	github.com/arewabolu/GoHaskell v0.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fredbi/uri v1.0.0 // indirect
