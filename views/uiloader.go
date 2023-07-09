@@ -52,13 +52,11 @@ func registerTeams(w fyne.Window) fyne.CanvasObject {
 	Select := widget.NewSelect(radOptions, func(s string) {
 	})
 
-	competitors := widget.NewEntry()
-	competitors.MultiLine = false
-	competitors.SetPlaceHolder("Add new team")
+	entry := widget.NewEntry()
 	saveCompetitors := widget.NewButton("Add team", func() {
-		models.AddToTeam(Select.Selected, competitors.Text)
-		models.AddtoRating(Select.Selected, competitors.Text)
-		entryDel(competitors)
+		models.AddToTeam(Select.Selected, entry.Text)
+		//models.AddtoRating(Select.Selected, competitors.Text)
+		entryDel(entry)
 	})
 	genRating := widget.NewButton("Generating Pi-ratings", func() {
 		controller.GenRating(Select.Selected)
@@ -69,12 +67,12 @@ func registerTeams(w fyne.Window) fyne.CanvasObject {
 		infoDialog.SetOnClosed(func() { w.RequestFocus() })
 	})
 	info.Resize(fyne.NewSize(10, 10))
-	cont := container.NewBorder(nil, nil, info, nil, genRating)
+	cont := container.NewVBox(container.NewBorder(nil, nil, info, nil, genRating))
 	exit := widget.NewButton("exit", func() {
 		w.SetContent(uiLoader(w))
 	})
-	hZ := container.NewBorder(nil, exit, nil, nil, competitors, saveCompetitors)
-	Vcont := container.NewVBox(Select, hZ, cont)
+
+	Vcont := container.NewBorder(container.NewVBox(Select, entry), exit, nil, nil, container.NewVBox(saveCompetitors), cont)
 	return Vcont
 }
 
